@@ -1,4 +1,19 @@
+const mongoose = require('mongoose');
+
 /**
- * Database configuration and connection logic
- * Responsible for establishing connection with MongoDB using Mongoose
+ * Connects to MongoDB database using Mongoose
+ * Logs success or failure to the console
  */
+const connectDB = async () => {
+  try {
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
+
+    console.log(`MongoDB Connected: ${conn.connection.host}`);
+  } catch (error) {
+    console.error(`Error connecting to MongoDB: ${error.message}`);
+    // Exit process with failure
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
