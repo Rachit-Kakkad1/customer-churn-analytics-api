@@ -15,9 +15,11 @@ const router = express.Router();
  * @access  Public (Placeholder)
  */
 router.get('/', (req, res) => {
+  // TODO: Implement analytics-based customer fetching
   res.status(200).json({
     success: true,
     message: 'Get all customers route placeholder',
+    data: [],
   });
 });
 
