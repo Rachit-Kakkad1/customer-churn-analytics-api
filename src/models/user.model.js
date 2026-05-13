@@ -37,10 +37,12 @@ const userSchema = new mongoose.Schema(
         message: '{VALUE} is not a valid role',
       },
       default: 'user',
+      index: true,
     },
     isActive: {
       type: Boolean,
       default: true,
+      index: true,
     },
     lastLogin: {
       type: Date,
