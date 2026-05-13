@@ -1,14 +1,15 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const path = require('path');
 
 // Load environment variables
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 
 // Body parser middleware
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+
 
 // Health check route
 app.get('/health', (req, res) => {
