@@ -12,9 +12,9 @@
  * @access  Public
  */
 const registerUser = async (req, res) => {
-  res.status(200).json({
+  res.status(201).json({
     success: true,
-    message: 'Register user controller placeholder',
+    message: 'User registered successfully (placeholder)',
   });
 };
 
@@ -26,7 +26,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Login user controller placeholder',
+    message: 'User logged in successfully (placeholder)',
   });
 };
 
