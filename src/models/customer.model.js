@@ -163,6 +163,7 @@ const customerSchema = new mongoose.Schema(
 );
 
 // Indexes for common analytics queries
+customerSchema.index({ age: 1, churned: 1 });
 customerSchema.index({ country: 1, churned: 1 });
 customerSchema.index({ signupQuarter: 1, churned: 1 });
 customerSchema.index({ lifetimeValue: -1 });
