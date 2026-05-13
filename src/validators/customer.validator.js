@@ -29,10 +29,14 @@ const baseCustomerSchema = {
   loginFrequency: Joi.number().min(0).default(0),
   sessionDurationAvg: Joi.number().min(0).default(0),
   pagesPerSession: Joi.number().min(0).default(0),
-  cartAbandonmentRate: Joi.number().min(0).max(100).default(0),
-  wishlistItems: Joi.number().integer().min(0).default(0),
-  totalPurchases: Joi.number().integer().min(0).default(0),
-  averageOrderValue: Joi.number().min(0).default(0),
+  cartAbandonmentRate: Joi.number().min(0).max(100).default(0).messages({
+    'number.max': 'Cart abandonment rate cannot exceed 100%',
+  }),
+  wishlistItems: Joi.number().integer().min(0).default(0).description('Number of items in the customer wishlist'),
+  totalPurchases: Joi.number().integer().min(0).default(0).description('Total number of purchases made by the customer'),
+  lifetimeValue: Joi.number().min(0).messages({
+    'number.min': 'Lifetime value must be a positive number',
+  }),
   daysSinceLastPurchase: Joi.number().min(0).default(0),
   discountUsageRate: Joi.number().min(0).max(100).default(0),
   returnsRate: Joi.number().min(0).max(100).default(0),
