@@ -8,6 +8,11 @@ const Joi = require('joi');
  * types, and constraints required for churn analytics.
  */
 
+const commonRules = {
+  nonNegative: (label) => Joi.number().min(0).messages({ 'number.min': `${label} cannot be negative` }),
+  percentage: (label) => Joi.number().min(0).max(100).messages({ 'number.max': `${label} cannot exceed 100%` }),
+};
+
 const baseCustomerSchema = {
   age: Joi.number().integer().min(0).max(120).messages({
     'number.base': 'Age must be a number',
@@ -16,37 +21,27 @@ const baseCustomerSchema = {
   }),
   gender: Joi.string()
     .valid('Male', 'Female', 'Other', 'Non-binary', 'Prefer not to say')
-    .messages({
-      'any.only': 'Invalid gender selection',
-    }),
-  country: Joi.string().trim().messages({
-    'string.empty': 'Country cannot be empty',
-  }),
-  city: Joi.string().trim().messages({
-    'string.empty': 'City cannot be empty',
-  }),
-  membershipYears: Joi.number().min(0).default(0),
-  loginFrequency: Joi.number().min(0).default(0),
-  sessionDurationAvg: Joi.number().min(0).default(0),
-  pagesPerSession: Joi.number().min(0).default(0),
-  cartAbandonmentRate: Joi.number().min(0).max(100).default(0).messages({
-    'number.max': 'Cart abandonment rate cannot exceed 100%',
-  }),
-  wishlistItems: Joi.number().integer().min(0).default(0).description('Number of items in the customer wishlist'),
-  totalPurchases: Joi.number().integer().min(0).default(0).description('Total number of purchases made by the customer'),
-  lifetimeValue: Joi.number().min(0).messages({
-    'number.min': 'Lifetime value must be a positive number',
-  }),
-  daysSinceLastPurchase: Joi.number().min(0).default(0),
-  discountUsageRate: Joi.number().min(0).max(100).default(0),
-  returnsRate: Joi.number().min(0).max(100).default(0),
-  emailOpenRate: Joi.number().min(0).max(100).default(0),
+    .messages({ 'any.only': 'Invalid gender selection' }),
+  country: Joi.string().trim().messages({ 'string.empty': 'Country cannot be empty' }),
+  city: Joi.string().trim().messages({ 'string.empty': 'City cannot be empty' }),
+  membershipYears: commonRules.nonNegative('Membership years').default(0),
+  loginFrequency: commonRules.nonNegative('Login frequency').default(0),
+  sessionDurationAvg: commonRules.nonNegative('Session duration').default(0),
+  pagesPerSession: commonRules.nonNegative('Pages per session').default(0),
+  cartAbandonmentRate: commonRules.percentage('Cart abandonment rate').default(0),
+  wishlistItems: Joi.number().integer().min(0).default(0),
+  totalPurchases: Joi.number().integer().min(0).default(0),
+  averageOrderValue: commonRules.nonNegative('Average order value').default(0),
+  daysSinceLastPurchase: commonRules.nonNegative('Days since last purchase').default(0),
+  discountUsageRate: commonRules.percentage('Discount usage rate').default(0),
+  returnsRate: commonRules.percentage('Returns rate').default(0),
+  emailOpenRate: commonRules.percentage('Email open rate').default(0),
   customerServiceCalls: Joi.number().integer().min(0).default(0),
   productReviewsWritten: Joi.number().integer().min(0).default(0),
-  socialMediaEngagementScore: Joi.number().min(0).max(100).default(0),
-  mobileAppUsage: Joi.number().min(0).default(0),
+  socialMediaEngagementScore: commonRules.percentage('Social media engagement score').default(0),
+  mobileAppUsage: commonRules.nonNegative('Mobile app usage').default(0),
   paymentMethodDiversity: Joi.number().integer().min(1).default(1),
-  lifetimeValue: Joi.number().min(0),
+  lifetimeValue: commonRules.nonNegative('Lifetime value'),
   creditBalance: Joi.number().default(0),
   churned: Joi.boolean().default(false),
   signupQuarter: Joi.string().valid('Q1', 'Q2', 'Q3', 'Q4').messages({
