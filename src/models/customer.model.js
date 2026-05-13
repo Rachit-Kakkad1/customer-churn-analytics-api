@@ -115,19 +115,19 @@ const customerSchema = new mongoose.Schema(
     socialMediaEngagementScore: {
       type: Number,
       default: 0,
-      min: [0, 'Engagement score cannot be negative'],
-      max: [100, 'Engagement score cannot exceed 100'],
+      min: [0, 'Social media engagement score must be at least 0'],
+      max: [100, 'Social media engagement score cannot exceed 100'],
     },
     mobileAppUsage: {
       type: Number,
       default: 0,
-      min: [0, 'Mobile app usage cannot be negative'],
+      min: [0, 'Mobile app usage (frequency/score) must be at least 0'],
       index: true,
     },
     paymentMethodDiversity: {
       type: Number,
       default: 1,
-      min: [1, 'At least one payment method is required'],
+      min: [1, 'At least one payment method (diversity count) is required'],
     },
     lifetimeValue: {
       type: Number,
