@@ -44,6 +44,7 @@ const getCustomerById = async (req, res) => {
       data: customer,
     });
   } catch (error) {
+    // Handle basic customer retrieval by ID error
     res.status(500).json({
       success: false,
       message: error.message,
