@@ -9,10 +9,19 @@ const Customer = require("../models/customer.model");
 // @route   GET /api/customers
 // @access  Public
 const getAllCustomers = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "Get all customers controller",
-  });
+  try {
+    const customers = await Customer.find();
+
+    res.status(200).json({
+      success: true,
+      data: customers,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 // @desc    Get single customer by ID
