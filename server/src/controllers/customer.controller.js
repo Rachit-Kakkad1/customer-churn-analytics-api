@@ -1,3 +1,5 @@
+const Customer = require("../models/customer.model");
+
 /**
  * Customer Controller
  * Placeholder functions for customer management
@@ -27,10 +29,20 @@ const getCustomerById = async (req, res) => {
 // @route   POST /api/customers
 // @access  Private
 const createCustomer = async (req, res) => {
-  res.status(201).json({
-    success: true,
-    message: "Create customer controller",
-  });
+  try {
+    const customer = await Customer.create(req.body);
+
+    res.status(201).json({
+      success: true,
+      data: customer,
+    });
+  } catch (error) {
+    // Handle basic errors during customer creation
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 // @desc    Update customer
