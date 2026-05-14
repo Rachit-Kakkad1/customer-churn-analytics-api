@@ -106,10 +106,28 @@ const updateCustomer = async (req, res) => {
 // @route   DELETE /api/customers/:id
 // @access  Private
 const deleteCustomer = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: `Delete customer controller for ID: ${req.params.id}`,
-  });
+  try {
+    const customer = await Customer.findByIdAndDelete(req.params.id);
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {},
+      message: "Customer deleted successfully",
+    });
+  } catch (error) {
+    // Handle basic customer deletion error
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {
