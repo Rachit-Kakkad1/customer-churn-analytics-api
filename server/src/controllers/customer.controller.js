@@ -94,6 +94,7 @@ const updateCustomer = async (req, res) => {
       data: customer,
     });
   } catch (error) {
+    // Handle basic customer update error
     res.status(500).json({
       success: false,
       message: error.message,
