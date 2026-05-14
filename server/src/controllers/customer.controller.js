@@ -122,6 +122,7 @@ const deleteCustomer = async (req, res) => {
       message: "Customer deleted successfully",
     });
   } catch (error) {
+    // Handle basic customer deletion error
     res.status(500).json({
       success: false,
       message: error.message,
