@@ -17,6 +17,7 @@ const getAllCustomers = async (req, res) => {
       data: customers,
     });
   } catch (error) {
+    // Handle basic customer retrieval error
     res.status(500).json({
       success: false,
       message: error.message,
