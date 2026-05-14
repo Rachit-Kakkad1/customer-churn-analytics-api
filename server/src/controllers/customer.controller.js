@@ -29,10 +29,27 @@ const getAllCustomers = async (req, res) => {
 // @route   GET /api/customers/:id
 // @access  Public
 const getCustomerById = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: `Get customer by ID controller for ID: ${req.params.id}`,
-  });
+  try {
+    const customer = await Customer.findById(req.params.id);
+
+    if (!customer) {
+      return res.status(404).json({
+        success: false,
+        message: "Customer not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: customer,
+    });
+  } catch (error) {
+    // Handle basic customer retrieval by ID error
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 // @desc    Create new customer
