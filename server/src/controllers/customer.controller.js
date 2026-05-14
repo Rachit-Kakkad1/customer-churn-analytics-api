@@ -37,6 +37,7 @@ const createCustomer = async (req, res) => {
       data: customer,
     });
   } catch (error) {
+    // Handle basic errors during customer creation
     res.status(500).json({
       success: false,
       message: error.message,
