@@ -10,7 +10,26 @@ const Customer = require("../models/customer.model");
 // @access  Public
 const getAllCustomers = async (req, res) => {
   try {
-    const customers = await Customer.find();
+    const filters = {};
+
+    // Basic filtering
+    if (req.query.country) {
+      filters.country = req.query.country;
+    }
+
+    if (req.query.gender) {
+      filters.gender = req.query.gender;
+    }
+
+    if (req.query.churned) {
+      filters.churned = req.query.churned;
+    }
+
+    if (req.query.city) {
+      filters.city = req.query.city;
+    }
+
+    const customers = await Customer.find(filters);
 
     res.status(200).json({
       success: true,
