@@ -14,7 +14,7 @@ const getAllCustomers = async (req, res) => {
     let queryObj = { ...req.query };
 
     // Fields to exclude from filtering
-    const excludeFields = ["page", "limit", "sort"];
+    const excludeFields = ["page", "limit", "sort", "fields"];
     excludeFields.forEach((param) => delete queryObj[param]);
 
     // Advanced filtering (gt, gte, lt, lte)
@@ -37,6 +37,12 @@ const getAllCustomers = async (req, res) => {
       }
     }
 
+    // Field selection (Projection)
+    let selectFields = "";
+    if (req.query.fields) {
+      selectFields = req.query.fields.split(",").join(" ");
+    }
+
     // Pagination
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
@@ -44,6 +50,7 @@ const getAllCustomers = async (req, res) => {
 
     const customers = await Customer.find(filters)
       .sort(sortQuery)
+      .select(selectFields)
       .skip(skip)
       .limit(limit);
 
