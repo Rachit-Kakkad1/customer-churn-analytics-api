@@ -14,7 +14,7 @@ const getAllCustomers = async (req, res) => {
     let queryObj = { ...req.query };
 
     // Fields to exclude from filtering
-    const excludeFields = ["page", "limit", "sort", "fields"];
+    const excludeFields = ["page", "limit", "sort", "fields", "search"];
     excludeFields.forEach((param) => delete queryObj[param]);
 
     // Advanced filtering (gt, gte, lt, lte)
@@ -25,6 +25,16 @@ const getAllCustomers = async (req, res) => {
     );
 
     const filters = JSON.parse(queryStr);
+
+    // Search functionality
+    if (req.query.search) {
+      filters.$or = [
+        { name: { $regex: req.query.search, $options: "i" } },
+        { email: { $regex: req.query.search, $options: "i" } },
+        { country: { $regex: req.query.search, $options: "i" } },
+        { city: { $regex: req.query.search, $options: "i" } },
+      ];
+    }
 
     // Sorting
     let sortQuery = {};
