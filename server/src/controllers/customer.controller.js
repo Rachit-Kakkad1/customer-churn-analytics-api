@@ -13,6 +13,10 @@ const getAllCustomers = async (req, res) => {
     // Copy req.query
     let queryObj = { ...req.query };
 
+    // Fields to exclude from filtering
+    const excludeFields = ["page", "limit"];
+    excludeFields.forEach((param) => delete queryObj[param]);
+
     // Advanced filtering (gt, gte, lt, lte)
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(
@@ -22,11 +26,18 @@ const getAllCustomers = async (req, res) => {
 
     const filters = JSON.parse(queryStr);
 
-    const customers = await Customer.find(filters);
+    // Pagination
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const customers = await Customer.find(filters).skip(skip).limit(limit);
 
     res.status(200).json({
       success: true,
       data: customers,
+      page,
+      limit,
     });
   } catch (error) {
     // Handle basic customer retrieval error
