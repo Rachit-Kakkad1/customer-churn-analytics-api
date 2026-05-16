@@ -1,36 +1,46 @@
 const express = require('express');
 const router = express.Router();
+const {
+  registerUser,
+  loginUser,
+  logoutUser,
+  getProfile,
+} = require('../controllers/auth.controller');
+const authMiddleware = require('../middlewares/auth.middleware');
 
 /**
  * Authentication Routes
  * 
  * This file defines the routing structure for user authentication,
- * including registration and login. Placeholder handlers are used 
- * until controllers are implemented.
+ * including registration, login, logout, and profile retrieval.
  */
 
 /**
- * @route   POST /register
+ * @route   POST /api/auth/register
  * @desc    Register a new user
  * @access  Public
  */
-router.post('/register', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'User registration route placeholder',
-  });
-});
+router.post('/register', registerUser);
 
 /**
- * @route   POST /login
+ * @route   POST /api/auth/login
  * @desc    Authenticate user and get token
  * @access  Public
  */
-router.post('/login', (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'User login route placeholder',
-  });
-});
+router.post('/login', loginUser);
+
+/**
+ * @route   GET /api/auth/logout
+ * @desc    Logout user / Clear cookie
+ * @access  Private
+ */
+router.get('/logout', authMiddleware, logoutUser);
+
+/**
+ * @route   GET /api/auth/profile
+ * @desc    Get current logged in user profile
+ * @access  Private
+ */
+router.get('/profile', authMiddleware, getProfile);
 
 module.exports = router;
