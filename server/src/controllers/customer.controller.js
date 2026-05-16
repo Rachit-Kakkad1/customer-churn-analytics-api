@@ -10,24 +10,17 @@ const Customer = require("../models/customer.model");
 // @access  Public
 const getAllCustomers = async (req, res) => {
   try {
-    const filters = {};
+    // Copy req.query
+    let queryObj = { ...req.query };
 
-    // Basic filtering
-    if (req.query.country) {
-      filters.country = req.query.country;
-    }
+    // Advanced filtering (gt, gte, lt, lte)
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(
+      /\b(gt|gte|lt|lte)\b/g,
+      (match) => `$${match}`
+    );
 
-    if (req.query.gender) {
-      filters.gender = req.query.gender;
-    }
-
-    if (req.query.churned) {
-      filters.churned = req.query.churned;
-    }
-
-    if (req.query.city) {
-      filters.city = req.query.city;
-    }
+    const filters = JSON.parse(queryStr);
 
     const customers = await Customer.find(filters);
 
