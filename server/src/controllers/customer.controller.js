@@ -14,7 +14,7 @@ const getAllCustomers = async (req, res) => {
     let queryObj = { ...req.query };
 
     // Fields to exclude from filtering
-    const excludeFields = ["page", "limit"];
+    const excludeFields = ["page", "limit", "sort"];
     excludeFields.forEach((param) => delete queryObj[param]);
 
     // Advanced filtering (gt, gte, lt, lte)
@@ -26,12 +26,26 @@ const getAllCustomers = async (req, res) => {
 
     const filters = JSON.parse(queryStr);
 
+    // Sorting
+    let sortQuery = {};
+    if (req.query.sort) {
+      const sortField = req.query.sort;
+      if (sortField.startsWith("-")) {
+        sortQuery[sortField.substring(1)] = -1;
+      } else {
+        sortQuery[sortField] = 1;
+      }
+    }
+
     // Pagination
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const customers = await Customer.find(filters).skip(skip).limit(limit);
+    const customers = await Customer.find(filters)
+      .sort(sortQuery)
+      .skip(skip)
+      .limit(limit);
 
     res.status(200).json({
       success: true,
