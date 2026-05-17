@@ -184,10 +184,61 @@ const deleteCustomer = async (req, res) => {
   }
 };
 
+// @desc    Get customer analytics
+// @route   GET /api/customers/analytics
+// @access  Private
+const getCustomerAnalytics = async (req, res) => {
+  try {
+    const stats = await Customer.aggregate([
+      {
+        $match: {},
+      },
+      {
+        $group: {
+          _id: null,
+          totalCustomers: { $sum: 1 },
+          churnedCustomers: {
+            $sum: { $cond: [{ $eq: ["$churned", true] }, 1, 0] },
+          },
+          averageAge: { $avg: "$age" },
+          averagePurchases: { $avg: "$totalPurchases" },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalCustomers: 1,
+          churnedCustomers: 1,
+          averageAge: { $round: ["$averageAge", 1] },
+          averagePurchases: { $round: ["$averagePurchases", 2] },
+        },
+      },
+    ]);
+
+    const result = stats.length > 0 ? stats[0] : {
+      totalCustomers: 0,
+      churnedCustomers: 0,
+      averageAge: 0,
+      averagePurchases: 0
+    };
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   getAllCustomers,
   getCustomerById,
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  getCustomerAnalytics,
 };
