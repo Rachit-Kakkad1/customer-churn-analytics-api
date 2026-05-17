@@ -4,10 +4,7 @@ const User = require("../models/user.model");
 
 /**
  * Authentication Controller
- * 
- * This file contains placeholder methods for user authentication operations
- * such as registration, login, logout, and profile retrieval.
- * Business logic and database integration will be implemented in future phases.
+ * Handles user registration, login, and profile operations
  */
 
 /**
@@ -16,10 +13,53 @@ const User = require("../models/user.model");
  * @access  Public
  */
 const registerUser = async (req, res) => {
-  res.status(201).json({
-    success: true,
-    message: 'User registered successfully (placeholder)',
-  });
+  try {
+    const { name, email, password, role } = req.body;
+
+    // Check if user already exists
+    const userExists = await User.findOne({ email });
+
+    if (userExists) {
+      return res.status(400).json({
+        success: false,
+        message: "User already exists",
+      });
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    if (user) {
+      res.status(201).json({
+        success: true,
+        data: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        message: "Invalid user data",
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 /**
@@ -69,6 +109,7 @@ const loginUser = async (req, res) => {
       user: {
         id: user._id,
         email: user.email,
+        name: user.name,
       },
     });
   } catch (error) {
@@ -87,7 +128,7 @@ const loginUser = async (req, res) => {
 const logoutUser = async (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Logout user controller placeholder',
+    message: "Logged out successfully",
   });
 };
 
@@ -97,10 +138,26 @@ const logoutUser = async (req, res) => {
  * @access  Private
  */
 const getProfile = async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Get user profile controller placeholder',
-  });
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 module.exports = {

@@ -1,8 +1,9 @@
-const Customer = require("../models/customer.model");
+const customerService = require("../services/customer.service");
+const analyticsService = require("../services/analytics.service");
 
 /**
  * Customer Controller
- * Placeholder functions for customer management
+ * Handles HTTP requests and delegates logic to the service layer
  */
 
 // @desc    Get all customers
@@ -10,59 +11,9 @@ const Customer = require("../models/customer.model");
 // @access  Public
 const getAllCustomers = async (req, res) => {
   try {
-    // Copy req.query
-    let queryObj = { ...req.query };
-
-    // Fields to exclude from filtering
-    const excludeFields = ["page", "limit", "sort", "fields", "search"];
-    excludeFields.forEach((param) => delete queryObj[param]);
-
-    // Advanced filtering (gt, gte, lt, lte)
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(
-      /\b(gt|gte|lt|lte)\b/g,
-      (match) => `$${match}`
+    const { customers, page, limit } = await customerService.getAllCustomers(
+      req.query
     );
-
-    const filters = JSON.parse(queryStr);
-
-    // Search functionality
-    if (req.query.search) {
-      filters.$or = [
-        { name: { $regex: req.query.search, $options: "i" } },
-        { email: { $regex: req.query.search, $options: "i" } },
-        { country: { $regex: req.query.search, $options: "i" } },
-        { city: { $regex: req.query.search, $options: "i" } },
-      ];
-    }
-
-    // Sorting
-    let sortQuery = {};
-    if (req.query.sort) {
-      const sortField = req.query.sort;
-      if (sortField.startsWith("-")) {
-        sortQuery[sortField.substring(1)] = -1;
-      } else {
-        sortQuery[sortField] = 1;
-      }
-    }
-
-    // Field selection (Projection)
-    let selectFields = "";
-    if (req.query.fields) {
-      selectFields = req.query.fields.split(",").join(" ");
-    }
-
-    // Pagination
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const customers = await Customer.find(filters)
-      .sort(sortQuery)
-      .select(selectFields)
-      .skip(skip)
-      .limit(limit);
 
     res.status(200).json({
       success: true,
@@ -71,7 +22,6 @@ const getAllCustomers = async (req, res) => {
       limit,
     });
   } catch (error) {
-    // Handle basic customer retrieval error
     res.status(500).json({
       success: false,
       message: error.message,
@@ -84,7 +34,7 @@ const getAllCustomers = async (req, res) => {
 // @access  Public
 const getCustomerById = async (req, res) => {
   try {
-    const customer = await Customer.findById(req.params.id);
+    const customer = await customerService.getCustomerById(req.params.id);
 
     if (!customer) {
       return res.status(404).json({
@@ -98,7 +48,6 @@ const getCustomerById = async (req, res) => {
       data: customer,
     });
   } catch (error) {
-    // Handle basic customer retrieval by ID error
     res.status(500).json({
       success: false,
       message: error.message,
@@ -111,14 +60,13 @@ const getCustomerById = async (req, res) => {
 // @access  Private
 const createCustomer = async (req, res) => {
   try {
-    const customer = await Customer.create(req.body);
+    const customer = await customerService.createCustomer(req.body);
 
     res.status(201).json({
       success: true,
       data: customer,
     });
   } catch (error) {
-    // Handle basic errors during customer creation
     res.status(500).json({
       success: false,
       message: error.message,
@@ -131,10 +79,10 @@ const createCustomer = async (req, res) => {
 // @access  Private
 const updateCustomer = async (req, res) => {
   try {
-    const customer = await Customer.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const customer = await customerService.updateCustomer(
+      req.params.id,
+      req.body
+    );
 
     if (!customer) {
       return res.status(404).json({
@@ -148,7 +96,6 @@ const updateCustomer = async (req, res) => {
       data: customer,
     });
   } catch (error) {
-    // Handle basic customer update error
     res.status(500).json({
       success: false,
       message: error.message,
@@ -161,7 +108,7 @@ const updateCustomer = async (req, res) => {
 // @access  Private
 const deleteCustomer = async (req, res) => {
   try {
-    const customer = await Customer.findByIdAndDelete(req.params.id);
+    const customer = await customerService.deleteCustomer(req.params.id);
 
     if (!customer) {
       return res.status(404).json({
@@ -172,11 +119,9 @@ const deleteCustomer = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: {},
       message: "Customer deleted successfully",
     });
   } catch (error) {
-    // Handle basic customer deletion error
     res.status(500).json({
       success: false,
       message: error.message,
@@ -189,38 +134,7 @@ const deleteCustomer = async (req, res) => {
 // @access  Private
 const getCustomerAnalytics = async (req, res) => {
   try {
-    const stats = await Customer.aggregate([
-      {
-        $match: {},
-      },
-      {
-        $group: {
-          _id: null,
-          totalCustomers: { $sum: 1 },
-          churnedCustomers: {
-            $sum: { $cond: [{ $eq: ["$churned", true] }, 1, 0] },
-          },
-          averageAge: { $avg: "$age" },
-          averagePurchases: { $avg: "$totalPurchases" },
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          totalCustomers: 1,
-          churnedCustomers: 1,
-          averageAge: { $round: ["$averageAge", 1] },
-          averagePurchases: { $round: ["$averagePurchases", 2] },
-        },
-      },
-    ]);
-
-    const result = stats.length > 0 ? stats[0] : {
-      totalCustomers: 0,
-      churnedCustomers: 0,
-      averageAge: 0,
-      averagePurchases: 0
-    };
+    const result = await analyticsService.getCustomerAnalytics();
 
     res.status(200).json({
       success: true,

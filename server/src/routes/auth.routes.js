@@ -7,6 +7,8 @@ const {
   getProfile,
 } = require('../controllers/auth.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const validate = require('../middlewares/validate.middleware');
+const { registerSchema, loginSchema } = require('../validators/auth.validator');
 
 /**
  * Authentication Routes
@@ -20,14 +22,14 @@ const authMiddleware = require('../middlewares/auth.middleware');
  * @desc    Register a new user
  * @access  Public
  */
-router.post('/register', registerUser);
+router.post('/register', validate(registerSchema), registerUser);
 
 /**
  * @route   POST /api/auth/login
  * @desc    Authenticate user and get token
  * @access  Public
  */
-router.post('/login', loginUser);
+router.post('/login', validate(loginSchema), loginUser);
 
 /**
  * @route   GET /api/auth/logout
