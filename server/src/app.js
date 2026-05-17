@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const loggerMiddleware = require('./middlewares/logger.middleware');
@@ -10,6 +11,9 @@ const customerRoutes = require('./routes/customer.routes');
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
+
+// Enable CORS
+app.use(cors());
 
 // Body parser middleware
 app.use(express.json());
