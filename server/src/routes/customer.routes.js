@@ -6,16 +6,27 @@ const {
   createCustomer,
   updateCustomer,
   deleteCustomer,
+  getCustomerAnalytics,
 } = require('../controllers/customer.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
+const validate = require('../middlewares/validate.middleware');
+const {
+  createCustomerSchema,
+  updateCustomerSchema,
+} = require('../validators/customer.validator');
 
 /**
  * Customer Management Routes
  * 
  * This file defines the routing structure for customer-related operations.
- * It includes endpoints for retrieving, creating, updating, and deleting
- * customer records.
  */
+
+/**
+ * @route   GET /api/customers/analytics
+ * @desc    Get customer analytics
+ * @access  Private
+ */
+router.get('/analytics', authMiddleware, getCustomerAnalytics);
 
 /**
  * @route   GET /api/customers
@@ -36,14 +47,14 @@ router.get('/:id', getCustomerById);
  * @desc    Create a new customer
  * @access  Private
  */
-router.post('/', authMiddleware, createCustomer);
+router.post('/', authMiddleware, validate(createCustomerSchema), createCustomer);
 
 /**
  * @route   PATCH /api/customers/:id
  * @desc    Update an existing customer
  * @access  Private
  */
-router.patch('/:id', authMiddleware, updateCustomer);
+router.patch('/:id', authMiddleware, validate(updateCustomerSchema), updateCustomer);
 
 /**
  * @route   DELETE /api/customers/:id
