@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -22,7 +23,10 @@ const navigationItems = [
 /**
  * Sidebar component supporting collapse states and styled hover indicators.
  */
-export const Sidebar = ({ isCollapsed, setIsCollapsed, activePath = '/dashboard' }) => {
+export const Sidebar = ({ isCollapsed, setIsCollapsed }) => {
+  const location = useLocation();
+  const activePath = location.pathname;
+
   return (
     <motion.aside
       animate={{ width: isCollapsed ? 72 : 240 }}
@@ -52,10 +56,9 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, activePath = '/dashboard'
           const Icon = item.icon;
 
           return (
-            <a
+            <Link
               key={item.name}
-              href={item.path}
-              onClick={(e) => e.preventDefault()} // Prepared for future routing
+              to={item.path}
               className={`flex items-center rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 group relative ${
                 isActive
                   ? 'bg-white/5 text-white shadow-inner border border-white/5'
@@ -72,7 +75,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, activePath = '/dashboard'
                   {item.name}
                 </motion.span>
               )}
-            </a>
+            </Link>
           );
         })}
       </nav>
