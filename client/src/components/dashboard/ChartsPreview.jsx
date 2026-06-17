@@ -14,15 +14,6 @@ import {
 import { TrendingUp, Activity, DollarSign } from 'lucide-react';
 
 // Mock timeline dataset for trends mapping Jan-Jun
-const monthlyTrendData = [
-  { month: 'Jan', retention: 98.2, churn: 1.8, revenue: 310 },
-  { month: 'Feb', retention: 97.9, churn: 2.1, revenue: 335 },
-  { month: 'Mar', retention: 98.5, churn: 1.5, revenue: 360 },
-  { month: 'Apr', retention: 97.2, churn: 2.8, revenue: 385 },
-  { month: 'May', retention: 98.8, churn: 1.2, revenue: 410 },
-  { month: 'Jun', retention: 97.6, churn: 2.4, revenue: 420 },
-];
-
 /**
  * Custom glassmorphic tooltip styling matching our premium dark system.
  */
@@ -47,8 +38,61 @@ const CustomTooltip = ({ active, payload, label }) => {
 /**
  * ChartsPreview displays retention, churn and revenue trends with premium SVGs.
  */
-export const ChartsPreview = () => {
+export const ChartsPreview = ({ analyticsData, loading = false, error = null }) => {
   const [activeTab, setActiveTab] = useState('overview');
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-white/5 bg-gradient-to-b from-[#0c0c14] to-[#07070a] p-6 shadow-xl shadow-black/40">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-white/5 pb-5 mb-6">
+          <div className="space-y-2">
+            <div className="h-5 w-48 rounded bg-white/10 animate-pulse" />
+            <div className="h-3.5 w-64 rounded bg-white/5 animate-pulse" />
+          </div>
+          <div className="h-8 w-32 rounded bg-white/5 animate-pulse" />
+        </div>
+        <div className="h-72 w-full flex items-end gap-4 justify-between px-2">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="flex-1 flex flex-col items-center gap-2">
+              <div 
+                className="w-full bg-white/[0.03] border-t border-indigo-500/20 rounded-t animate-pulse" 
+                style={{ height: `${30 + (i % 3) * 20}%` }} 
+              />
+              <div className="h-3 w-8 rounded bg-white/5 animate-pulse" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-rose-500/10 bg-gradient-to-b from-[#12070a] to-[#07070a] p-6 shadow-xl shadow-black/40 flex flex-col items-center justify-center h-[396px] text-center">
+        <div className="h-12 w-12 rounded-full bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 mb-4 animate-bounce">
+          <TrendingUp className="h-6 w-6 transform rotate-180" />
+        </div>
+        <h3 className="text-sm font-semibold text-white">Diagnostics Stream Unavailable</h3>
+        <p className="text-xs text-neutral-400 mt-1 max-w-xs leading-relaxed">
+          {error.message || 'Unable to connect to the analytics compilation service.'}
+        </p>
+      </div>
+    );
+  }
+
+  const monthlyTrendData = [
+    { month: 'Jan', retention: 98.2, churn: 1.8, revenue: 310 },
+    { month: 'Feb', retention: 97.9, churn: 2.1, revenue: 335 },
+    { month: 'Mar', retention: 98.5, churn: 1.5, revenue: 360 },
+    { month: 'Apr', retention: 97.2, churn: 2.8, revenue: 385 },
+    { month: 'May', retention: 98.8, churn: 1.2, revenue: 410 },
+    {
+      month: 'Jun',
+      retention: analyticsData?.retentionRate !== undefined ? Number(analyticsData.retentionRate.toFixed(1)) : 97.6,
+      churn: analyticsData?.churnRate !== undefined ? Number(analyticsData.churnRate.toFixed(1)) : 2.4,
+      revenue: analyticsData?.revenueImpact !== undefined ? Math.round(analyticsData.revenueImpact / 1000) : 420,
+    },
+  ];
 
   return (
     <div className="rounded-xl border border-white/5 bg-gradient-to-b from-[#0c0c14] to-[#07070a] p-6 shadow-xl shadow-black/40">
