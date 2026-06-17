@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
  * Reusable premium Pagination component styled with glassmorphism and Vercel/Linear aesthetics.
  */
 export const Pagination = ({ currentPage, setCurrentPage, totalPages }) => {
+  // Handle layout boundary cases where pagination is not needed
   if (totalPages <= 1) return null;
 
   // Generate page numbers to render
