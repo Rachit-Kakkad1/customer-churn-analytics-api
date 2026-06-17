@@ -2,16 +2,16 @@
 
 @theme {
   --font-sans: "Inter", "system-ui", "-apple-system", "sans-serif";
-  
-  --color-background: #0a0a0a;
+
+  --color-background: #050508;
   --color-foreground: #ffffff;
-  --color-border: rgba(255, 255, 255, 0.1);
-  
-  --color-brand-primary: #000000;
-  --color-brand-secondary: #ffffff;
-  
+  --color-border: rgba(255, 255, 255, 0.08);
+
+  --color-brand-primary: #6366f1;
+  --color-brand-secondary: #8b5cf6;
+
   --breakpoint-xs: 480px;
-  
+
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
 
@@ -19,6 +19,7 @@
     from { height: 0; }
     to { height: var(--radix-accordion-content-height); }
   }
+
   @keyframes accordion-up {
     from { height: var(--radix-accordion-content-height); }
     to { height: 0; }
@@ -32,7 +33,7 @@
 
   color-scheme: dark;
   color: #ffffff;
-  background-color: #0a0a0a;
+  background-color: #050508;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -44,13 +45,49 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #0a0a0a;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  background-color: #050508;
   color: #ffffff;
+  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
+}
+
+/* Smooth scrolling */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Focus visible ring */
+:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.6);
+  outline-offset: 2px;
+}
+
+/* Custom checkbox styling (peer hack fallback) */
+input[type="checkbox"] {
+  cursor: pointer;
+}
+
+/* Ensure SVG path doesn't break in custom checkbox */
+.peer:checked ~ .peer-checked\:block {
+  display: block !important;
 }
 
 @layer base {

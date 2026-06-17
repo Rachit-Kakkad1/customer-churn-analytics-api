@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { cn } from "../../lib/utils";
+import { cn } from "../../lib/utils.js";
 
 const navLinks = [
   { name: "Features", href: "#features" },

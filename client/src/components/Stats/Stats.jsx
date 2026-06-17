@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useInView } from "framer-motion";
-import { useRef } from "react";
 
 const stats = [
   {
@@ -29,7 +28,7 @@ const stats = [
   },
 ];
 
-const AnimatedNumber = ({ value }: { value: number }) => {
+const AnimatedNumber = ({ value }) => {
   const [current, setCurrent] = useState(0);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -72,9 +71,7 @@ export const Stats = () => {
                 {stat.suffix}
               </div>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-white/90">
-                  {stat.label}
-                </span>
+                <span className="text-sm font-semibold text-white/90">{stat.label}</span>
                 <span className="text-xs text-white/40">{stat.description}</span>
               </div>
             </div>
