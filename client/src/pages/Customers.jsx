@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Sparkles } from 'lucide-react';
 import { DashboardLayout } from '../layouts/DashboardLayout.jsx';
@@ -6,23 +6,11 @@ import { SearchBar } from '../components/customers/SearchBar.jsx';
 import { FilterPanel } from '../components/customers/FilterPanel.jsx';
 import { CustomerTable } from '../components/customers/CustomerTable.jsx';
 import { Pagination } from '../components/customers/Pagination.jsx';
-
-// Local static mock customers list dataset (augmented with gender properties)
-const mockCustomersList = [
-  { id: 1, name: 'Rachit Kakkad', email: 'rachit@churnly.com', country: 'Germany', status: 'active', gender: 'Male' },
-  { id: 2, name: 'Acme Enterprise', email: 'billing@acme.com', country: 'United States', status: 'danger', gender: 'Other' },
-  { id: 3, name: 'Helena Vance', email: 'helena.v@vancecorp.io', country: 'United Kingdom', status: 'warning', gender: 'Female' },
-  { id: 4, name: 'Douglas Adams', email: 'doug@guide.net', country: 'United Kingdom', status: 'active', gender: 'Male' },
-  { id: 5, name: 'Globex Software', email: 'contact@globex.de', country: 'Germany', status: 'warning', gender: 'Other' },
-  { id: 6, name: 'Hiroshi Tanaka', email: 'tanaka.h@nexus.jp', country: 'Japan', status: 'active', gender: 'Male' },
-  { id: 7, name: 'Sophie Dubois', email: 's.dubois@aurora.fr', country: 'France', status: 'danger', gender: 'Female' },
-  { id: 8, name: 'Marcus Aurelius', email: 'marcus@stoic.it', country: 'Italy', status: 'active', gender: 'Male' },
-  { id: 9, name: 'Nova Logistics', email: 'operations@nova.ca', country: 'Canada', status: 'active', gender: 'Other' },
-  { id: 10, name: 'Evelyn Martinez', email: 'evelyn@martinez-group.es', country: 'Spain', status: 'warning', gender: 'Female' },
-];
+import customerService from '../services/customerService.js';
 
 /**
- * Customers Landing View coordinating customer lists, search input bars, filter panels, and table grids with pagination.
+ * Customers Landing View coordinating customer lists, search input bars, filter panels,
+ * and table grids with pagination connected to the backend API.
  */
 export const Customers = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -32,55 +20,77 @@ export const Customers = () => {
     gender: '',
     status: '',
   });
-  const itemsPerPage = 5;
 
-  // Reset page index on search queries or filter updates
+  const [customers, setCustomers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 5;
+
+  const fetchCustomers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const queryParams = {
+        page: currentPage,
+        limit: limit,
+      };
+
+      if (searchTerm.trim()) {
+        queryParams.search = searchTerm.trim();
+      }
+      if (filters.country) {
+        queryParams.country = filters.country;
+      }
+      if (filters.gender) {
+        queryParams.gender = filters.gender;
+      }
+      if (filters.status) {
+        queryParams.status = filters.status;
+      }
+
+      const res = await customerService.getCustomers(queryParams);
+      if (res && res.success) {
+        setCustomers(res.data || []);
+        
+        // Handle backend pagination metadata if present, else fallback
+        const returnedCount = res.data ? res.data.length : 0;
+        if (res.totalPages !== undefined) {
+          setTotalPages(res.totalPages);
+        } else if (res.totalCount !== undefined) {
+          setTotalPages(Math.ceil(res.totalCount / limit));
+        } else {
+          // If no count is returned, estimate pages based on limit threshold
+          if (returnedCount === limit) {
+            setTotalPages(currentPage + 1);
+          } else {
+            setTotalPages(currentPage);
+          }
+        }
+      } else {
+        throw new Error(res.message || 'Failed to fetch customer data.');
+      }
+    } catch (err) {
+      console.error('Error fetching customers:', err);
+      setError(err.message || 'Unable to connect to the backend server.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Reset page index on search queries or filter updates to avoid out of bounds
   useEffect(() => {
-    setCurrentPage(1);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      fetchCustomers();
+    }
   }, [searchTerm, filters]);
 
-  // Memoized search and filter check on name, email, country, gender, and status case-insensitively
-  const filteredCustomers = useMemo(() => {
-    const query = searchTerm.toLowerCase().trim();
-    return mockCustomersList.filter((customer) => {
-      const matchesSearch =
-        !query ||
-        customer.name.toLowerCase().includes(query) ||
-        customer.email.toLowerCase().includes(query) ||
-        customer.country.toLowerCase().includes(query);
-
-      const matchesCountry =
-        !filters.country ||
-        customer.country.toLowerCase() === filters.country.toLowerCase();
-
-      const matchesGender =
-        !filters.gender ||
-        customer.gender.toLowerCase() === filters.gender.toLowerCase();
-
-      const matchesStatus =
-        !filters.status ||
-        customer.status.toLowerCase() === filters.status.toLowerCase();
-
-      return matchesSearch && matchesCountry && matchesGender && matchesStatus;
-    });
-  }, [searchTerm, filters]);
-
-  // Pagination Calculations
-  const totalPages = useMemo(() => {
-    return Math.ceil(filteredCustomers.length / itemsPerPage);
-  }, [filteredCustomers.length]);
-
-  const startIndex = useMemo(() => {
-    return (currentPage - 1) * itemsPerPage;
+  // Fetch customers whenever page selection shifts
+  useEffect(() => {
+    fetchCustomers();
   }, [currentPage]);
-
-  const endIndex = useMemo(() => {
-    return startIndex + itemsPerPage;
-  }, [startIndex]);
-
-  const paginatedCustomers = useMemo(() => {
-    return filteredCustomers.slice(startIndex, endIndex);
-  }, [filteredCustomers, startIndex, endIndex]);
 
   const handleClearFilters = () => {
     setFilters({
@@ -133,8 +143,7 @@ export const Customers = () => {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <SearchBar onSearch={setSearchTerm} />
             <div className="text-[10px] text-neutral-500 font-medium whitespace-nowrap bg-white/[0.01] border border-white/5 rounded-lg px-3 py-2 animate-fade-in">
-              Showing <span className="text-white font-semibold">{paginatedCustomers.length}</span> of{' '}
-              <span className="text-white font-semibold">{filteredCustomers.length}</span> records
+              Showing <span className="text-white font-semibold">{customers.length}</span> records on this page
             </div>
           </div>
 
@@ -151,7 +160,11 @@ export const Customers = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <CustomerTable paginatedCustomers={paginatedCustomers} />
+          <CustomerTable
+            customers={customers}
+            loading={loading}
+            error={error}
+          />
           <Pagination
             currentPage={currentPage}
             setCurrentPage={setCurrentPage}

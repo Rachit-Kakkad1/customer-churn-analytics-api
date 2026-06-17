@@ -4,6 +4,11 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
  * Reusable premium Pagination component styled with glassmorphism and Vercel/Linear aesthetics.
+ * 
+ * @param {Object} props - Component properties
+ * @param {number} props.currentPage - Active page index passed from parent state
+ * @param {function} props.setCurrentPage - Setter handler updating active page index
+ * @param {number} props.totalPages - Total available pages computed from dataset bounds
  */
 export const Pagination = ({ currentPage, setCurrentPage, totalPages }) => {
   // Handle layout boundary cases where pagination is not needed
