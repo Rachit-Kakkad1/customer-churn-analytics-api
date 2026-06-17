@@ -5,7 +5,7 @@ import { ShieldAlert, UserCheck, AlertTriangle, AlertCircle } from 'lucide-react
 /**
  * CustomerTable grid displaying names, emails, countries, and status metrics.
  */
-export const CustomerTable = ({ filteredCustomers }) => {
+export const CustomerTable = ({ paginatedCustomers }) => {
   // Helpers to assign styling badges based on customer status properties
   const getStatusBadge = (status) => {
     const maps = {
@@ -54,8 +54,8 @@ export const CustomerTable = ({ filteredCustomers }) => {
           {/* Table Body rows */}
           <tbody className="divide-y divide-white/5">
             <AnimatePresence mode="popLayout">
-              {filteredCustomers.length > 0 ? (
-                filteredCustomers.map((customer, idx) => (
+              {paginatedCustomers.length > 0 ? (
+                paginatedCustomers.map((customer, idx) => (
                   <motion.tr
                     key={customer.id}
                     initial={{ opacity: 0, y: 10 }}

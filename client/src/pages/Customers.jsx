@@ -1,43 +1,94 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Sparkles } from 'lucide-react';
 import { DashboardLayout } from '../layouts/DashboardLayout.jsx';
 import { SearchBar } from '../components/customers/SearchBar.jsx';
+import { FilterPanel } from '../components/customers/FilterPanel.jsx';
 import { CustomerTable } from '../components/customers/CustomerTable.jsx';
+import { Pagination } from '../components/customers/Pagination.jsx';
 
-// Local static mock customers list dataset
+// Local static mock customers list dataset (augmented with gender properties)
 const mockCustomersList = [
-  { id: 1, name: 'Rachit Kakkad', email: 'rachit@churnly.com', country: 'Germany', status: 'active' },
-  { id: 2, name: 'Acme Enterprise', email: 'billing@acme.com', country: 'United States', status: 'danger' },
-  { id: 3, name: 'Helena Vance', email: 'helena.v@vancecorp.io', country: 'United Kingdom', status: 'warning' },
-  { id: 4, name: 'Douglas Adams', email: 'doug@guide.net', country: 'United Kingdom', status: 'active' },
-  { id: 5, name: 'Globex Software', email: 'contact@globex.de', country: 'Germany', status: 'warning' },
-  { id: 6, name: 'Hiroshi Tanaka', email: 'tanaka.h@nexus.jp', country: 'Japan', status: 'active' },
-  { id: 7, name: 'Sophie Dubois', email: 's.dubois@aurora.fr', country: 'France', status: 'danger' },
-  { id: 8, name: 'Marcus Aurelius', email: 'marcus@stoic.it', country: 'Italy', status: 'active' },
-  { id: 9, name: 'Nova Logistics', email: 'operations@nova.ca', country: 'Canada', status: 'active' },
-  { id: 10, name: 'Evelyn Martinez', email: 'evelyn@martinez-group.es', country: 'Spain', status: 'warning' },
+  { id: 1, name: 'Rachit Kakkad', email: 'rachit@churnly.com', country: 'Germany', status: 'active', gender: 'Male' },
+  { id: 2, name: 'Acme Enterprise', email: 'billing@acme.com', country: 'United States', status: 'danger', gender: 'Other' },
+  { id: 3, name: 'Helena Vance', email: 'helena.v@vancecorp.io', country: 'United Kingdom', status: 'warning', gender: 'Female' },
+  { id: 4, name: 'Douglas Adams', email: 'doug@guide.net', country: 'United Kingdom', status: 'active', gender: 'Male' },
+  { id: 5, name: 'Globex Software', email: 'contact@globex.de', country: 'Germany', status: 'warning', gender: 'Other' },
+  { id: 6, name: 'Hiroshi Tanaka', email: 'tanaka.h@nexus.jp', country: 'Japan', status: 'active', gender: 'Male' },
+  { id: 7, name: 'Sophie Dubois', email: 's.dubois@aurora.fr', country: 'France', status: 'danger', gender: 'Female' },
+  { id: 8, name: 'Marcus Aurelius', email: 'marcus@stoic.it', country: 'Italy', status: 'active', gender: 'Male' },
+  { id: 9, name: 'Nova Logistics', email: 'operations@nova.ca', country: 'Canada', status: 'active', gender: 'Other' },
+  { id: 10, name: 'Evelyn Martinez', email: 'evelyn@martinez-group.es', country: 'Spain', status: 'warning', gender: 'Female' },
 ];
 
 /**
- * Customers Landing View coordinating customer lists, search input bars, and table grids.
+ * Customers Landing View coordinating customer lists, search input bars, filter panels, and table grids with pagination.
  */
 export const Customers = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [filters, setFilters] = useState({
+    country: '',
+    gender: '',
+    status: '',
+  });
+  const itemsPerPage = 5;
 
-  // Memoized search filter checking name, email, and country properties case-insensitively
+  // Reset page index on search queries or filter updates
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filters]);
+
+  // Memoized search and filter check on name, email, country, gender, and status case-insensitively
   const filteredCustomers = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return mockCustomersList;
-    }
     const query = searchTerm.toLowerCase().trim();
-    return mockCustomersList.filter(
-      (customer) =>
+    return mockCustomersList.filter((customer) => {
+      const matchesSearch =
+        !query ||
         customer.name.toLowerCase().includes(query) ||
         customer.email.toLowerCase().includes(query) ||
-        customer.country.toLowerCase().includes(query)
-    );
-  }, [searchTerm]);
+        customer.country.toLowerCase().includes(query);
+
+      const matchesCountry =
+        !filters.country ||
+        customer.country.toLowerCase() === filters.country.toLowerCase();
+
+      const matchesGender =
+        !filters.gender ||
+        customer.gender.toLowerCase() === filters.gender.toLowerCase();
+
+      const matchesStatus =
+        !filters.status ||
+        customer.status.toLowerCase() === filters.status.toLowerCase();
+
+      return matchesSearch && matchesCountry && matchesGender && matchesStatus;
+    });
+  }, [searchTerm, filters]);
+
+  // Pagination Calculations
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredCustomers.length / itemsPerPage);
+  }, [filteredCustomers.length]);
+
+  const startIndex = useMemo(() => {
+    return (currentPage - 1) * itemsPerPage;
+  }, [currentPage]);
+
+  const endIndex = useMemo(() => {
+    return startIndex + itemsPerPage;
+  }, [startIndex]);
+
+  const paginatedCustomers = useMemo(() => {
+    return filteredCustomers.slice(startIndex, endIndex);
+  }, [filteredCustomers, startIndex, endIndex]);
+
+  const handleClearFilters = () => {
+    setFilters({
+      country: '',
+      gender: '',
+      status: '',
+    });
+  };
 
   return (
     <DashboardLayout>
@@ -72,26 +123,40 @@ export const Customers = () => {
           </motion.p>
         </div>
 
-        {/* Search Input Filter Controls */}
+        {/* Search & Advanced Filters Panel Controls */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.15 }}
-          className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+          className="flex flex-col gap-4"
         >
-          <SearchBar onSearch={setSearchTerm} />
-          <div className="text-[10px] text-neutral-500 font-medium whitespace-nowrap bg-white/[0.01] border border-white/5 rounded-lg px-3 py-2">
-            Showing <span className="text-white font-semibold">{filteredCustomers.length}</span> of <span className="text-white font-semibold">{mockCustomersList.length}</span> records
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <SearchBar onSearch={setSearchTerm} />
+            <div className="text-[10px] text-neutral-500 font-medium whitespace-nowrap bg-white/[0.01] border border-white/5 rounded-lg px-3 py-2 animate-fade-in">
+              Showing <span className="text-white font-semibold">{paginatedCustomers.length}</span> of{' '}
+              <span className="text-white font-semibold">{filteredCustomers.length}</span> records
+            </div>
           </div>
+
+          <FilterPanel
+            filters={filters}
+            setFilters={setFilters}
+            onClear={handleClearFilters}
+          />
         </motion.div>
 
-        {/* Index Table Grid Viewport */}
+        {/* Index Table Grid Viewport and Pagination Controls */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <CustomerTable filteredCustomers={filteredCustomers} />
+          <CustomerTable paginatedCustomers={paginatedCustomers} />
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
         </motion.div>
       </div>
     </DashboardLayout>
