@@ -8,6 +8,10 @@ import { loginSchema } from "../../utils/validation.js";
 import { usePasswordToggle } from "../../hooks/usePasswordToggle.js";
 import { SocialButtons, SubmitButton } from "./SocialButtons.jsx";
 import { cn } from "../../lib/utils.js";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginStart, loginSuccess, loginFailure } from "../../features/auth/authSlice.js";
+import { login } from "../../services/authService.js";
 
 const fieldVariants = {
   hidden: { opacity: 0, x: -12 },
@@ -54,6 +58,8 @@ const inputClass = (hasError) =>
   );
 
 export const LoginForm = ({ onSwitch }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isVisible, toggleVisibility, inputType } = usePasswordToggle();
 
   const {
@@ -62,11 +68,22 @@ export const LoginForm = ({ onSwitch }) => {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(loginSchema) });
 
-  const onSubmit = async (_data) => {
-    await new Promise((r) => setTimeout(r, 1600));
-    toast.success("Signed in successfully!", {
-      description: "Welcome back to Churnly Analytics.",
-    });
+  const onSubmit = async (data) => {
+    dispatch(loginStart());
+    try {
+      const response = await login({ email: data.email, password: data.password });
+      dispatch(loginSuccess({ user: response.user, token: response.token }));
+      toast.success("Signed in successfully!", {
+        description: "Welcome back to Churnly Analytics.",
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || error.message || "Failed to log in.";
+      dispatch(loginFailure(errorMsg));
+      toast.error("Authentication failed", {
+        description: errorMsg,
+      });
+    }
   };
 
   return (

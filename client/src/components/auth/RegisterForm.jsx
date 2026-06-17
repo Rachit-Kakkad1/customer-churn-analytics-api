@@ -9,6 +9,10 @@ import { usePasswordToggle } from "../../hooks/usePasswordToggle.js";
 import { SocialButtons, SubmitButton } from "./SocialButtons.jsx";
 import { PasswordStrength } from "./PasswordStrength.jsx";
 import { cn } from "../../lib/utils.js";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { loginStart, loginSuccess, loginFailure } from "../../features/auth/authSlice.js";
+import { register as registerUser, login } from "../../services/authService.js";
 
 const fieldVariants = {
   hidden: { opacity: 0, x: -12 },
@@ -55,6 +59,8 @@ const inputClass = (hasError) =>
   );
 
 export const RegisterForm = ({ onSwitch }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isVisible, toggleVisibility, inputType } = usePasswordToggle();
   const [passwordValue, setPasswordValue] = useState("");
 
@@ -67,11 +73,35 @@ export const RegisterForm = ({ onSwitch }) => {
 
   const pwd = watch("password", "");
 
-  const onSubmit = async (_data) => {
-    await new Promise((r) => setTimeout(r, 1800));
-    toast.success("Account created!", {
-      description: "Welcome to Churnly Analytics. Let's reduce churn.",
-    });
+  const onSubmit = async (data) => {
+    dispatch(loginStart());
+    try {
+      // Create account
+      await registerUser({
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+      });
+
+      // Authenticate session automatically
+      const loginResponse = await login({
+        email: data.email,
+        password: data.password,
+      });
+
+      dispatch(loginSuccess({ user: loginResponse.user, token: loginResponse.token }));
+      
+      toast.success("Account created and signed in!", {
+        description: "Welcome to Churnly Analytics. Let's reduce churn.",
+      });
+      navigate("/dashboard");
+    } catch (error) {
+      const errorMsg = error.response?.data?.message || error.message || "Failed to register account.";
+      dispatch(loginFailure(errorMsg));
+      toast.error("Registration failed", {
+        description: errorMsg,
+      });
+    }
   };
 
   return (

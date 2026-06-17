@@ -5,6 +5,8 @@ import { Toaster } from 'sonner';
 
 import { Landing } from '../pages/Landing.jsx';
 import { Login } from '../pages/Login.jsx';
+import { Dashboard } from '../pages/Dashboard.jsx';
+import { Customers } from '../pages/Customers.jsx';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute.jsx';
 import { restoreSession } from '../features/auth/authSlice.js';
 
@@ -47,12 +49,15 @@ export const AppRouter = () => {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <div className="flex h-screen w-screen items-center justify-center bg-[#07070a] font-sans text-neutral-200">
-                <div className="flex flex-col items-center gap-2 text-center">
-                  <h1 className="text-3xl font-semibold tracking-tight text-white">Dashboard</h1>
-                  <p className="text-sm text-neutral-400">Coming Soon</p>
-                </div>
-              </div>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/customers"
+          element={
+            <ProtectedRoute>
+              <Customers />
             </ProtectedRoute>
           }
         />
