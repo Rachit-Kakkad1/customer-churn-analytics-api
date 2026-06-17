@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { cn } from "../../lib/utils";
 
 const navLinks = [
@@ -33,12 +34,12 @@ export const Navbar = () => {
       )}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 group cursor-pointer">
+        <Link to="/" className="flex items-center gap-2 group cursor-pointer">
           <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform">
             <div className="w-4 h-4 bg-black rounded-sm" />
           </div>
-          <span className="font-bold text-xl tracking-tight">Churnly</span>
-        </div>
+          <span className="font-bold text-xl tracking-tight text-white">Churnly</span>
+        </Link>
 
         {/* Desktop Links */}
         <div className="hidden md:flex items-center gap-8">
@@ -61,11 +62,11 @@ export const Navbar = () => {
             rel="noopener noreferrer"
             className="p-2 hover:bg-white/10 rounded-full transition-colors"
           >
-            <FaGithub className="w-5 h-5" />
+            <FaGithub className="w-5 h-5 text-white" />
           </a>
-          <button className="text-sm font-medium px-4 py-2 hover:text-white/70 transition-colors">
+          <Link to="/login" className="text-sm font-medium px-4 py-2 text-white/70 hover:text-white transition-colors">
             Login
-          </button>
+          </Link>
           <button className="bg-white text-black text-sm font-bold px-5 py-2.5 rounded-full hover:bg-white/90 transition-all flex items-center gap-2 group">
             Get Started
             <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -102,9 +103,9 @@ export const Navbar = () => {
                 </a>
               ))}
               <div className="flex flex-col gap-3 mt-4">
-                <button className="w-full text-center py-3 border border-white/10 rounded-xl">
+                <Link to="/login" className="w-full text-center py-3 border border-white/10 rounded-xl text-white">
                   Login
-                </button>
+                </Link>
                 <button className="w-full text-center py-3 bg-white text-black font-bold rounded-xl">
                   Get Started
                 </button>

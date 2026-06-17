@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 import { DashboardPreview } from "./DashboardPreview";
 
 export const BrandPanel = () => {
@@ -11,15 +12,18 @@ export const BrandPanel = () => {
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5 }}
-        className="flex items-center gap-3 mb-12"
+        className="mb-12"
       >
-        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center rotate-12 hover:rotate-0 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
-          <div className="w-5 h-5 bg-black rounded-sm" />
-        </div>
-        <span className="font-bold text-2xl tracking-tight text-white">Churnly</span>
+        <Link to="/" className="inline-flex items-center gap-3">
+          <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center rotate-12 hover:rotate-0 transition-transform duration-500 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+            <div className="w-5 h-5 bg-black rounded-sm" />
+          </div>
+          <span className="font-bold text-2xl tracking-tight text-white">Churnly</span>
+        </Link>
       </motion.div>
 
       {/* Hero Content */}
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

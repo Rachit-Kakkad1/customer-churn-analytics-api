@@ -5,6 +5,7 @@ import { AnimatedBackground } from "../components/auth/AnimatedBackground";
 import { LoginForm } from "../components/auth/LoginForm";
 import { SocialLogin } from "../components/auth/SocialLogin";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export const Login = () => {
   return (
@@ -18,11 +19,13 @@ export const Login = () => {
       rightPanel={
         <div className="flex flex-col w-full relative">
           {/* Subtle mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-12 self-center">
-            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center rotate-12">
-              <div className="w-4 h-4 bg-black rounded-sm" />
-            </div>
-            <span className="font-bold text-xl tracking-tight text-white">Churnly</span>
+          <div className="lg:hidden flex justify-center mb-12">
+            <Link to="/" className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center rotate-12">
+                <div className="w-4 h-4 bg-black rounded-sm" />
+              </div>
+              <span className="font-bold text-xl tracking-tight text-white">Churnly</span>
+            </Link>
           </div>
 
           <motion.div
