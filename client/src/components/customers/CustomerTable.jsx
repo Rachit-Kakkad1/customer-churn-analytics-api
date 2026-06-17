@@ -1,32 +1,47 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ShieldAlert, UserCheck, AlertTriangle, AlertCircle } from 'lucide-react';
+import { ShieldAlert, UserCheck, AlertCircle } from 'lucide-react';
 
 /**
- * CustomerTable grid displaying names, emails, countries, and status metrics.
+ * Skeleton Loader row for table loading transitions
  */
-export const CustomerTable = ({ paginatedCustomers }) => {
-  // Helpers to assign styling badges based on customer status properties
-  const getStatusBadge = (status) => {
-    const maps = {
-      active: {
-        label: 'Active',
-        icon: UserCheck,
-        class: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/15',
-      },
-      warning: {
-        label: 'Warning',
-        icon: AlertTriangle,
-        class: 'text-amber-400 bg-amber-500/10 border-amber-500/15',
-      },
-      danger: {
-        label: 'High Risk',
-        icon: ShieldAlert,
-        class: 'text-rose-400 bg-rose-500/10 border-rose-500/15',
-      },
-    };
+const SkeletonRow = () => (
+  <tr className="border-b border-white/5 animate-pulse">
+    <td className="py-4 px-6">
+      <div className="h-4 w-28 bg-white/10 rounded" />
+    </td>
+    <td className="py-4 px-6">
+      <div className="h-4 w-40 bg-white/5 rounded" />
+    </td>
+    <td className="py-4 px-6">
+      <div className="h-4 w-20 bg-white/5 rounded" />
+    </td>
+    <td className="py-4 px-6">
+      <div className="h-5 w-20 bg-white/5 rounded-full" />
+    </td>
+  </tr>
+);
 
-    const config = maps[status] || maps.active;
+/**
+ * CustomerTable grid displaying dynamic names, emails, countries, and churn statuses
+ * supporting loading skeletons, error states, and empty states.
+ */
+export const CustomerTable = ({ customers, loading, error }) => {
+  
+  // Render status badge mapping based on backend churned boolean
+  const getStatusBadge = (customer) => {
+    const config = customer.churned
+      ? {
+          label: 'High Churn Risk',
+          icon: ShieldAlert,
+          class: 'text-rose-400 bg-rose-500/10 border-rose-500/15',
+        }
+      : {
+          label: 'Active',
+          icon: UserCheck,
+          class: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/15',
+        };
+
     const Icon = config.icon;
 
     return (
@@ -54,24 +69,56 @@ export const CustomerTable = ({ paginatedCustomers }) => {
           {/* Table Body rows */}
           <tbody className="divide-y divide-white/5">
             <AnimatePresence mode="popLayout">
-              {paginatedCustomers.length > 0 ? (
-                paginatedCustomers.map((customer, idx) => (
-                  <motion.tr
-                    key={customer.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2, delay: idx * 0.03 }}
-                    className="group hover:bg-white/[0.01] transition-colors"
-                  >
-                    <td className="py-4 px-6 font-medium text-white">{customer.name}</td>
-                    <td className="py-4 px-6 text-neutral-400">{customer.email}</td>
-                    <td className="py-4 px-6 text-neutral-400">{customer.country}</td>
-                    <td className="py-4 px-6">{getStatusBadge(customer.status)}</td>
-                  </motion.tr>
+              {loading ? (
+                // Render loading skeletons
+                Array.from({ length: 5 }).map((_, idx) => (
+                  <SkeletonRow key={`skeleton-${idx}`} />
                 ))
+              ) : error ? (
+                // Error State Container
+                <motion.tr
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <td colSpan={4} className="py-16 px-6 text-center select-none">
+                    <div className="flex flex-col items-center gap-3 max-w-sm mx-auto text-rose-400">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-rose-500/20 bg-rose-500/5">
+                        <AlertCircle className="h-5 w-5" />
+                      </div>
+                      <h3 className="text-sm font-semibold tracking-tight text-white">Database connection failure</h3>
+                      <p className="text-[11px] text-neutral-500 leading-normal">
+                        {error}
+                      </p>
+                    </div>
+                  </td>
+                </motion.tr>
+              ) : customers.length > 0 ? (
+                // Render customer records
+                customers.map((customer, idx) => {
+                  const customerIdSuffix = customer._id ? customer._id.slice(-6).toUpperCase() : 'N/A';
+                  // Generate synthetic placeholders if Mongoose schema select limits name/email
+                  const displayName = customer.name || `User #${customerIdSuffix}`;
+                  const displayEmail = customer.email || `user.${customerIdSuffix.toLowerCase()}@churnly.com`;
+
+                  return (
+                    <motion.tr
+                      key={customer._id || customer.id || idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2, delay: idx * 0.03 }}
+                      className="group hover:bg-white/[0.01] transition-colors"
+                    >
+                      <td className="py-4 px-6 font-medium text-white">{displayName}</td>
+                      <td className="py-4 px-6 text-neutral-400">{displayEmail}</td>
+                      <td className="py-4 px-6 text-neutral-400">{customer.country || 'N/A'}</td>
+                      <td className="py-4 px-6">{getStatusBadge(customer)}</td>
+                    </motion.tr>
+                  );
+                })
               ) : (
-                /* Empty state container row */
+                // Empty State Container
                 <motion.tr
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -97,4 +144,5 @@ export const CustomerTable = ({ paginatedCustomers }) => {
     </div>
   );
 };
+
 export default CustomerTable;
