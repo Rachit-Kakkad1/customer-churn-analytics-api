@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Sparkles } from 'lucide-react';
 import { DashboardLayout } from '../layouts/DashboardLayout.jsx';
 import { SearchBar } from '../components/customers/SearchBar.jsx';
 import { CustomerTable } from '../components/customers/CustomerTable.jsx';
+import { Pagination } from '../components/customers/Pagination.jsx';
 
 // Local static mock customers list dataset
 const mockCustomersList = [
@@ -20,10 +21,17 @@ const mockCustomersList = [
 ];
 
 /**
- * Customers Landing View coordinating customer lists, search input bars, and table grids.
+ * Customers Landing View coordinating customer lists, search input bars, and table grids with pagination.
  */
 export const Customers = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  // Reset page index on new search queries
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // Memoized search filter checking name, email, and country properties case-insensitively
   const filteredCustomers = useMemo(() => {
@@ -38,6 +46,23 @@ export const Customers = () => {
         customer.country.toLowerCase().includes(query)
     );
   }, [searchTerm]);
+
+  // Pagination Calculations
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredCustomers.length / itemsPerPage);
+  }, [filteredCustomers.length]);
+
+  const startIndex = useMemo(() => {
+    return (currentPage - 1) * itemsPerPage;
+  }, [currentPage]);
+
+  const endIndex = useMemo(() => {
+    return startIndex + itemsPerPage;
+  }, [startIndex]);
+
+  const paginatedCustomers = useMemo(() => {
+    return filteredCustomers.slice(startIndex, endIndex);
+  }, [filteredCustomers, startIndex, endIndex]);
 
   return (
     <DashboardLayout>
@@ -80,18 +105,24 @@ export const Customers = () => {
           className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
         >
           <SearchBar onSearch={setSearchTerm} />
-          <div className="text-[10px] text-neutral-500 font-medium whitespace-nowrap bg-white/[0.01] border border-white/5 rounded-lg px-3 py-2">
-            Showing <span className="text-white font-semibold">{filteredCustomers.length}</span> of <span className="text-white font-semibold">{mockCustomersList.length}</span> records
+          <div className="text-[10px] text-neutral-500 font-medium whitespace-nowrap bg-white/[0.01] border border-white/5 rounded-lg px-3 py-2 animate-fade-in">
+            Showing <span className="text-white font-semibold">{paginatedCustomers.length}</span> of{' '}
+            <span className="text-white font-semibold">{filteredCustomers.length}</span> records
           </div>
         </motion.div>
 
-        {/* Index Table Grid Viewport */}
+        {/* Index Table Grid Viewport and Pagination Controls */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <CustomerTable filteredCustomers={filteredCustomers} />
+          <CustomerTable paginatedCustomers={paginatedCustomers} />
+          <Pagination
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
         </motion.div>
       </div>
     </DashboardLayout>
