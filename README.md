@@ -42,9 +42,6 @@ This system isn't just a CRUD application; it's a comprehensive analytics platfo
 | **Mongoose** | ODM (Object Data Modeling) |
 | **JWT** | Secure Authentication |
 | **Bcrypt.js** | Password Hashing |
-| **Morgan** | HTTP Request Logging |
-| **Helmet** | Security Header Management |
-| **Express-Rate-Limit** | API Rate Limiting |
 | **Dotenv** | Environment Variable Management |
 
 ---
@@ -53,11 +50,11 @@ This system isn't just a CRUD application; it's a comprehensive analytics platfo
 
 -   👤 **Advanced User Management**: Role-based access control (RBAC) and profile management.
 -   📊 **Real-time Analytics**: Dynamic calculation of customer retention and churn rates.
--   🛡️ **Proactive Security**: JWT-based auth, password hashing, and XSS protection.
+-   🛡️ **Proactive Security**: JWT-based auth and password hashing.
 -   📈 **Predictive Scoring**: Algorithm-driven churn risk assessment based on activity patterns.
 -   🚀 **High Performance**: Optimized MongoDB queries and indexing strategies.
 -   📡 **RESTful API**: Clean, intuitive, and standard-compliant API design.
--   🔄 **Automated Pipelines**: Middleware-driven data validation and sanitization.
+-   🔄 **Automated Pipelines**: Middleware-driven data validation and sanitzation.
 
 ---
 
@@ -67,8 +64,6 @@ We take security seriously. This API implements industry-standard security pract
 
 -   **JWT Authentication**: Stateless authentication using signed tokens.
 -   **Password Hashing**: Bcrypt with a salt factor of 12 for maximum entropy.
--   **Rate Limiting**: Preventing Brute-force attacks by limiting requests per IP.
--   **Security Headers**: Integrated `helmet` for protection against common web vulnerabilities.
 -   **CORS Protection**: Controlled cross-origin resource sharing.
 -   **Input Validation**: Strict schema-based validation using Mongoose and custom middleware.
 
@@ -96,9 +91,8 @@ Every list endpoint supports advanced query parameters:
 
 ### 🛡️ Middleware Architecture
 -   `authMiddleware`: Validates JWT and attaches user to the request.
--   `roleMiddleware`: Restricts access based on user roles (Admin, Analyst, User).
 -   `errorMiddleware`: Centralized error handling for consistent API responses.
--   `requestLogger`: Logs detailed request metadata for auditing.
+-   `loggerMiddleware`: Logs detailed request metadata for auditing.
 
 ---
 
@@ -106,20 +100,19 @@ Every list endpoint supports advanced query parameters:
 
 ```text
 ecommerce-customer-churn-analytics-api/
-├── src/
-│   ├── config/             # Database & environment configurations
-│   ├── controllers/        # Business logic for routes
-│   ├── middleware/         # Custom Express middleware
-│   ├── models/             # Mongoose schemas & models
-│   ├── routes/             # API route definitions
-│   ├── utils/              # Helper functions & constants
-│   ├── services/           # External service integrations (Analytics, Email)
-│   └── app.js              # Express application setup
-├── tests/                  # Unit & Integration tests
-├── .env.example            # Template for environment variables
-├── .gitignore              # Git ignore file
-├── package.json            # Project dependencies & scripts
-└── server.js               # Entry point for the server
+├── server/                 # Backend source code
+│   ├── src/
+│   │   ├── config/         # Database & environment configurations
+│   │   ├── controllers/    # Business logic for routes
+│   │   ├── middlewares/    # Custom Express middleware
+│   │   ├── models/         # Mongoose schemas & models
+│   │   ├── routes/         # API route definitions
+│   │   ├── utils/          # Helper functions & constants
+│   │   ├── services/       # External service integrations (Analytics, Email)
+│   │   └── app.js          # Express application setup
+│   ├── .env.example        # Template for environment variables
+│   ├── package.json        # Project dependencies & scripts
+│   └── server.js           # Entry point for the server
 ```
 
 ---
@@ -134,18 +127,18 @@ cd ecommerce-customer-churn-analytics-api
 
 ### 2. Install dependencies
 ```bash
+cd server
 npm install
 ```
 
 ### 3. Setup Environment Variables
-Create a `.env` file in the root directory and add the following:
+Create a `.env` file in the `server` directory and add the following:
 ```env
 PORT=5000
 NODE_ENV=development
 MONGO_URI=mongodb+srv://your_username:your_password@cluster0.mongodb.net/churnDB
 JWT_SECRET=your_super_secret_key
-JWT_EXPIRES_IN=90d
-RATE_LIMIT_MAX=100
+JWT_EXPIRES_IN=1d
 ```
 
 ### 4. Run the application
@@ -164,24 +157,24 @@ npm start
 ### 🔐 Authentication
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| POST | `/api/v1/auth/register` | Register a new user | Public |
-| POST | `/api/v1/auth/login` | Login user & get token | Public |
-| GET | `/api/v1/auth/me` | Get current user info | Private |
+| POST | `/api/auth/register` | Register a new user | Public |
+| POST | `/api/auth/login` | Login user & get token | Public |
+| GET | `/api/auth/logout` | Logout user | Private |
+| GET | `/api/auth/profile` | Get current user info | Private |
 
 ### 👥 Customers
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| GET | `/api/v1/customers` | Get all customers with filters | Admin/Analyst |
-| POST | `/api/v1/customers` | Add a new customer | Admin |
-| GET | `/api/v1/customers/:id` | Get single customer details | Private |
-| PATCH | `/api/v1/customers/:id` | Update customer data | Admin |
+| GET | `/api/customers` | Get all customers | Public |
+| POST | `/api/customers` | Add a new customer | Private |
+| GET | `/api/customers/:id` | Get single customer details | Public |
+| PATCH | `/api/customers/:id` | Update customer data | Private |
+| DELETE | `/api/customers/:id` | Delete customer data | Private |
 
 ### 📈 Analytics
 | Method | Endpoint | Description | Access |
 | :--- | :--- | :--- | :--- |
-| GET | `/api/v1/analytics/churn-stats` | Get overall churn statistics | Admin |
-| GET | `/api/v1/analytics/risk-report` | Get high-risk customer report | Admin |
-| GET | `/api/v1/analytics/revenue` | Get revenue analytics | Admin |
+| GET | `/api/customers/analytics` | Get overall churn statistics | Private |
 
 ---
 
@@ -264,39 +257,24 @@ The API uses a global error-handling middleware to ensure consistent responses:
 
 ## 📡 API Usage Examples
 
-### 🔍 Get High-Risk Customers
-**Endpoint**: `GET /api/v1/analytics/risk-report?riskScore[gte]=0.7&limit=5`
+### 🔍 Get Customer Analytics
+**Endpoint**: `GET /api/customers/analytics`
 
 **Sample Request**:
 ```bash
-curl -X GET "https://api.churnanalytics.com/api/v1/analytics/risk-report?riskScore[gte]=0.7&limit=5" \
+curl -X GET "https://api.churnanalytics.com/api/customers/analytics" \
      -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
 **Sample Response**:
 ```json
 {
-  "status": "success",
-  "results": 2,
+  "success": true,
   "data": {
-    "customers": [
-      {
-        "_id": "64b1f2e5c9e1a2b3c4d5e6f7",
-        "name": "John Doe",
-        "email": "john.doe@example.com",
-        "churnScore": 0.85,
-        "lastPurchase": "2023-05-20T10:30:00Z",
-        "status": "active"
-      },
-      {
-        "_id": "64b1f2e5c9e1a2b3c4d5e6f8",
-        "name": "Jane Smith",
-        "email": "jane.smith@example.com",
-        "churnScore": 0.72,
-        "lastPurchase": "2023-06-15T14:20:00Z",
-        "status": "active"
-      }
-    ]
+    "totalCustomers": 150,
+    "churnedCustomers": 45,
+    "averageAge": 34.5,
+    "averagePurchases": 12.4
   }
 }
 ```
