@@ -1,116 +1,128 @@
-# 📊 Ecommerce Customer Churn Analytics API
+# 🧠 Customer Churn Analytics - API Engine
 
-A robust Node.js/Express backend designed for high-performance customer data management and behavioral analytics. This API provides advanced querying capabilities, secure authentication, and complex data aggregation for churn prediction.
+[![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongoosejs.com/)
+[![Joi](https://img.shields.io/badge/Joi-Validation-blue?style=for-the-badge)](https://joi.dev/)
 
-## 🚀 Features
+The backend of the Customer Churn Analytics platform is a robust, production-ready Node.js API designed for high-performance data processing and secure resource management.
 
-- **Secure Authentication**: JWT-based auth with password hashing (bcryptjs) and role-based access.
-- **Full CRUD Operations**: Managed customer lifecycle with strict Joi validation.
-- **Advanced Querying Engine**: Support for MongoDB operators ($gte, $lt), regex search, sorting, and pagination.
-- **Aggregation Analytics**: High-level statistical reporting using MongoDB Aggregation Framework.
-- **Standardized Middleware**: Integrated logging, error handling, and validation layers.
+---
+
+## 🚀 Core Features
+
+-   🔐 **JWT-Based Auth**: Secure sessions with BcryptJS password hashing and HTTP-only cookie support.
+-   📈 **Aggregation Engine**: Uses MongoDB Aggregation Framework for real-time KPI calculations.
+-   🔍 **Advanced Querying**: Built-in support for filtering, sorting, pagination, and field projection.
+-   🛡️ **Validation Layer**: Strict request body and parameter validation using Joi schemas.
+-   🏥 **Health Monitoring**: Integrated `/health` endpoint for uptime tracking.
+
+---
 
 ## 🛠 Tech Stack
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
-- **Database**: MongoDB (Mongoose ODM)
-- **Validation**: Joi
-- **Security**: JWT, BcryptJS, CORS
+-   **Framework**: Express.js (v5)
+-   **Database**: MongoDB with Mongoose ODM
+-   **Security**: JWT, CORS, Dotenv, BcryptJS
+-   **Validation**: Joi
+-   **Dev Tools**: Nodemon
 
-## 📂 Folder Structure
+---
+
+## 📂 Architecture
 
 ```text
 server/
 ├── src/
-│   ├── config/       # Database & Environment config
-│   ├── controllers/  # Request handlers
-│   ├── middlewares/  # Auth, Error, Logger, Validation
-│   ├── models/       # Mongoose Schemas
-│   ├── routes/       # API Route definitions
-│   ├── services/     # Business logic & DB queries
-│   └── validators/   # Joi validation schemas
-└── .env              # Environment variables
+│   ├── config/         # DB connection & environment setup
+│   ├── controllers/    # Request handlers (Business Logic)
+│   ├── middlewares/    # Auth, Error, Logger, Validation
+│   ├── models/         # Mongoose Schemas (Customer, User)
+│   ├── routes/         # Express Route definitions
+│   ├── services/       # Database & Aggregate logic
+│   └── validators/     # Joi validation rules
+└── server.js           # Server entry point
 ```
 
-## ⚙️ Environment Variables
+---
 
-Create a `.env` file in the `server/` root:
+## ⚙️ Environment Configuration
+
+Create a `.env` file in this directory:
 
 ```env
 PORT=5000
-MONGODB_URI=mongodb://localhost:27017/churn-db
-JWT_SECRET=your_super_secret_key
 NODE_ENV=development
+MONGO_URI=mongodb+srv://<user>:<password>@cluster.mongodb.net/churnDB
+JWT_SECRET=your_super_secret_key
+JWT_EXPIRES_IN=1d
 ```
 
-## 🛠 Installation & Setup
-
-1. **Install Dependencies**:
-   ```bash
-   cd server
-   npm install
-   ```
-
-2. **Run Locally**:
-   ```bash
-   # Development mode (with nodemon)
-   npm run dev
-
-   # Production mode
-   npm start
-   ```
+---
 
 ## 📖 API Documentation
 
-### Authentication
+### **Authentication**
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| POST | `/api/auth/register` | Public | Create a new user account |
-| POST | `/api/auth/login` | Public | Authenticate and receive JWT |
-| GET | `/api/auth/profile` | Private | Get current user profile |
-| GET | `/api/auth/logout` | Private | Terminate session (client-side cleanup) |
+| `POST` | `/api/auth/register` | Public | Register new admin/user |
+| `POST` | `/api/auth/login` | Public | Login & get Bearer Token |
+| `GET` | `/api/auth/profile` | Private | Get authenticated user info |
+| `GET` | `/api/auth/logout` | Private | Clear active session |
 
-### Customer Management
+### **Customer Management**
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| GET | `/api/customers` | Public | List all customers (supports filtering) |
-| GET | `/api/customers/:id` | Public | Get specific customer details |
-| POST | `/api/customers` | Private | Add a new customer record |
-| PATCH | `/api/customers/:id` | Private | Update customer attributes |
-| DELETE | `/api/customers/:id` | Private | Remove customer record |
+| `GET` | `/api/customers` | Public | List customers (w/ Filter/Sort) |
+| `POST` | `/api/customers` | Private | Create new customer record |
+| `GET` | `/api/customers/:id` | Public | Get detailed customer view |
+| `PATCH` | `/api/customers/:id` | Private | Update customer metrics |
+| `DELETE` | `/api/customers/:id` | Private | Remove customer from DB |
 
-### Analytics & Reports
+### **Analytics**
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| GET | `/api/customers/analytics` | Private | Get aggregated churn & engagement stats |
+| `GET` | `/api/customers/analytics` | Private | Get aggregated churn stats |
 
-## 🔍 Query Features
+---
 
-The `/api/customers` endpoint supports advanced MongoDB querying:
+## 🔍 Advanced Search Features
 
-- **Filtering**: `/api/customers?country=USA&gender=Male`
-- **Operators**: `/api/customers?age[gte]=25&lifetimeValue[lt]=1000`
-- **Search**: `/api/customers?search=john` (searches name, email, city, country)
-- **Sorting**: `/api/customers?sort=-lifetimeValue` (use `-` for descending)
-- **Pagination**: `/api/customers?page=1&limit=10`
-- **Projection**: `/api/customers?fields=name,email,churned`
+The `/api/customers` endpoint supports powerful query params:
+-   **Filter**: `?status=active&age[gte]=18`
+-   **Sort**: `?sort=-totalSpent,createdAt`
+-   **Search**: `?search=John` (matches Name, Email, City)
+-   **Paginate**: `?page=1&limit=20`
 
-## 🛡 Security & Middleware
+---
 
-- **Auth Middleware**: Validates Bearer tokens in headers.
-- **Validation Middleware**: Uses Joi to enforce data integrity before hitting controllers.
-- **Error Middleware**: Centralized error formatting for consistent API responses.
-- **Logger**: Time-stamped request logging for debugging.
+## 🛡 Security & Error Handling
 
-## 📝 Error Format
-All errors follow this standard structure:
+1.  **Authorization**: Middleware ensures only valid JWT holders can access Private routes.
+2.  **Global Error Handler**: Standardized JSON responses for all 4xx and 5xx errors.
+3.  **Logger**: Detailed request/response logging for production debugging.
+
 ```json
 {
   "success": false,
-  "message": "Specific error message here"
+  "message": "Resource not found"
 }
 ```
 
-## 👨‍💻 Author
-**Rachit Kakkad**
+---
+
+## 👨‍💻 Developer Guide
+
+**Install Dependencies:**
+```bash
+npm install
+```
+
+**Development Mode:**
+```bash
+npm run dev
+```
+
+**Production Start:**
+```bash
+npm start
+```

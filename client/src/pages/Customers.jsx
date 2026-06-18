@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Sparkles, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
@@ -33,45 +33,26 @@ export const Customers = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
 
-  const fetchCustomers = async () => {
+  const fetchCustomers = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const queryParams = {
-        page: currentPage,
-        limit: limit,
-      };
-
-      if (searchTerm.trim()) {
-        queryParams.search = searchTerm.trim();
-      }
-      if (filters.country) {
-        queryParams.country = filters.country;
-      }
-      if (filters.gender) {
-        queryParams.gender = filters.gender;
-      }
-      if (filters.status) {
-        queryParams.status = filters.status;
-      }
+      const queryParams = { page: currentPage, limit };
+      if (searchTerm.trim()) queryParams.search = searchTerm.trim();
+      if (filters.country) queryParams.country = filters.country;
+      if (filters.gender) queryParams.gender = filters.gender;
+      if (filters.status) queryParams.status = filters.status;
 
       const res = await customerService.getCustomers(queryParams);
       if (res && res.success) {
         setCustomers(res.data || []);
-        
-        // Handle backend pagination metadata if present, else fallback
         const returnedCount = res.data ? res.data.length : 0;
         if (res.totalPages !== undefined) {
           setTotalPages(res.totalPages);
         } else if (res.totalCount !== undefined) {
           setTotalPages(Math.ceil(res.totalCount / limit));
         } else {
-          // If no count is returned, estimate pages based on limit threshold
-          if (returnedCount === limit) {
-            setTotalPages(currentPage + 1);
-          } else {
-            setTotalPages(currentPage);
-          }
+          setTotalPages(returnedCount === limit ? currentPage + 1 : currentPage);
         }
       } else {
         throw new Error(res.message || 'Failed to fetch customer data.');
@@ -82,7 +63,7 @@ export const Customers = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, searchTerm, filters]);
 
   // Reset page index on search queries or filter updates to avoid out of bounds
   useEffect(() => {
@@ -96,27 +77,31 @@ export const Customers = () => {
   // Fetch customers whenever page selection shifts
   useEffect(() => {
     fetchCustomers();
-  }, [currentPage]);
+  }, [fetchCustomers]);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setFilters({
       country: '',
       gender: '',
       status: '',
     });
-  };
+  }, []);
 
-  const handleOpenCreate = () => {
+  const handleOpenCreate = useCallback(() => {
     setEditingCustomer(null);
     setModalOpen(true);
-  };
+  }, []);
 
-  const handleOpenEdit = (customer) => {
+  const handleOpenEdit = useCallback((customer) => {
     setEditingCustomer(customer);
     setModalOpen(true);
-  };
+  }, []);
 
-  const handleModalSubmit = async (data) => {
+  const handleCloseModal = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+
+  const handleModalSubmit = useCallback(async (data) => {
     try {
       if (editingCustomer) {
         await customerService.updateCustomer(editingCustomer._id, data);
@@ -132,9 +117,9 @@ export const Customers = () => {
       const message = err.response?.data?.message || err.message || 'Operation failed.';
       toast.error(message);
     }
-  };
+  }, [editingCustomer, fetchCustomers]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     if (window.confirm('Are you sure you want to permanently delete this customer record?')) {
       try {
         await customerService.deleteCustomer(id);
@@ -146,7 +131,7 @@ export const Customers = () => {
         toast.error(message);
       }
     }
-  };
+  }, [fetchCustomers]);
 
   return (
     <DashboardLayout>
@@ -238,7 +223,7 @@ export const Customers = () => {
         {/* Customer Modal dialogue overlay */}
         <CustomerModal
           isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleCloseModal}
           onSubmit={handleModalSubmit}
           customer={editingCustomer}
         />

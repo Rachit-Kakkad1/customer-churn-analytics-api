@@ -1,15 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { Toaster } from 'sonner';
 
 import { Landing } from '../pages/Landing.jsx';
 import { Login } from '../pages/Login.jsx';
-import { Dashboard } from '../pages/Dashboard.jsx';
-import { Customers } from '../pages/Customers.jsx';
 import { ProtectedRoute } from '../components/auth/ProtectedRoute.jsx';
 import { restoreSession } from '../features/auth/authSlice.js';
 import { DashboardLayout } from '../layouts/DashboardLayout.jsx';
+
+// Lazy loaded page components
+const Dashboard = lazy(() => import('../pages/Dashboard.jsx'));
+const Customers = lazy(() => import('../pages/Customers.jsx'));
+const Profile = lazy(() => import('../pages/Profile.jsx'));
+const Settings = lazy(() => import('../pages/Settings.jsx'));
 
 /**
  * Premium placeholder for modules under construction
@@ -28,6 +32,18 @@ const ComingSoon = ({ title }) => (
       <p className="text-sm text-neutral-400 max-w-sm">This module is currently under development. Check back soon for updates!</p>
     </div>
   </DashboardLayout>
+);
+
+/**
+ * Simple animated page loader to show during bundle resolution
+ */
+const PageLoader = () => (
+  <div className="flex h-screen w-screen items-center justify-center bg-[#07070a] text-neutral-400">
+    <div className="flex flex-col items-center gap-3">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-indigo-500 border-t-transparent" />
+      <span className="text-xs font-semibold tracking-wider text-neutral-500 uppercase">Loading...</span>
+    </div>
+  </div>
 );
 
 /**
@@ -59,53 +75,56 @@ export const AppRouter = () => {
         }}
       />
 
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/login" element={<Login />} />
 
-        {/* Protected Routes */}
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/customers"
-          element={
-            <ProtectedRoute>
-              <Customers />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/analytics"
-          element={
-            <ProtectedRoute>
-              <ComingSoon title="Analytics Overview" />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute>
-              <ComingSoon title="User Profile" />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/settings"
-          element={
-            <ProtectedRoute>
-              <ComingSoon title="System Settings" />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/customers"
+            element={
+              <ProtectedRoute>
+                <Customers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/analytics"
+            element={
+              <ProtectedRoute>
+                <ComingSoon title="Analytics Overview" />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };
+

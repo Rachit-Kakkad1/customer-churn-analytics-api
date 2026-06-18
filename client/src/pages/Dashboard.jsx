@@ -11,7 +11,7 @@ import analyticsService from '../services/analyticsService.js';
  * Enhanced Dashboard Page rendering stats cards summary panels, trend charts, and system logs timeline.
  */
 export const Dashboard = () => {
-  const [analytics, setAnalytics] = useState(null);
+  const [rawAnalytics, setRawAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -22,23 +22,7 @@ export const Dashboard = () => {
       .then((res) => {
         if (!active) return;
         if (res.success && res.data) {
-          const raw = res.data;
-          const total = raw.totalCustomers ?? 0;
-          const churned = raw.churnedCustomers ?? 0;
-          const churnRate = total > 0 ? (churned / total) * 100 : 0;
-          const retentionRate = 100 - churnRate;
-          // Calculate a simulated premium revenue impact: total customers * average purchases * 8.2 scale
-          const revenueImpact = total * (raw.averagePurchases ?? 0) * 8.2;
-
-          setAnalytics({
-            totalCustomers: total,
-            churnedCustomers: churned,
-            churnRate,
-            retentionRate,
-            revenueImpact,
-            averageAge: raw.averageAge ?? 0,
-            averagePurchases: raw.averagePurchases ?? 0
-          });
+          setRawAnalytics(res.data);
         } else {
           throw new Error('Analytics diagnostics payload not standard.');
         }
@@ -54,46 +38,100 @@ export const Dashboard = () => {
     };
   }, []);
 
-  const stats = [
-    {
-      title: 'Total Customers',
-      value: loading ? '...' : (analytics?.totalCustomers ?? 0).toLocaleString(),
-      trend: '+14.2%',
-      trendDirection: 'up',
-      description: 'vs previous month',
-      icon: Users,
-      colorSchema: 'blue',
-    },
-    {
-      title: 'Churn Rate',
-      value: loading ? '...' : `${(analytics?.churnRate ?? 0).toFixed(1)}%`,
-      trend: '-0.8%',
-      trendDirection: 'down',
-      description: 'vs previous month',
-      icon: Percent,
-      colorSchema: 'rose',
-    },
-    {
-      title: 'Retention Rate',
-      value: loading ? '...' : `${(analytics?.retentionRate ?? 0).toFixed(1)}%`,
-      trend: '+0.5%',
-      trendDirection: 'up',
-      description: 'vs previous month',
-      icon: Activity,
-      colorSchema: 'indigo',
-    },
-    {
-      title: 'Revenue Impact',
-      value: loading ? '...' : `$${Math.round(analytics?.revenueImpact ?? 0).toLocaleString()}`,
-      trend: '+22.5%',
-      trendDirection: 'up',
-      description: 'projected growth',
-      icon: DollarSign,
-      colorSchema: 'emerald',
-    },
-  ];
+  // Memoize raw analytics calculation processing
+  const analytics = React.useMemo(() => {
+    if (!rawAnalytics) return null;
+    const total = rawAnalytics.totalCustomers ?? 0;
+    const churned = rawAnalytics.churnedCustomers ?? 0;
+    const churnRate = total > 0 ? (churned / total) * 100 : 0;
+    const retentionRate = 100 - churnRate;
+    const revenueImpact = total * (rawAnalytics.averagePurchases ?? 0) * 8.2;
+
+    return {
+      totalCustomers: total,
+      churnedCustomers: churned,
+      churnRate,
+      retentionRate,
+      revenueImpact,
+      averageAge: rawAnalytics.averageAge ?? 0,
+      averagePurchases: rawAnalytics.averagePurchases ?? 0
+    };
+  }, [rawAnalytics]);
+
+  // Memoize static and dynamic stats data list
+  const stats = React.useMemo(() => {
+    return [
+      {
+        title: 'Total Customers',
+        value: loading ? '...' : (analytics?.totalCustomers ?? 0).toLocaleString(),
+        trend: '+14.2%',
+        trendDirection: 'up',
+        description: 'vs previous month',
+        icon: Users,
+        colorSchema: 'blue',
+      },
+      {
+        title: 'Churn Rate',
+        value: loading ? '...' : `${(analytics?.churnRate ?? 0).toFixed(1)}%`,
+        trend: '-0.8%',
+        trendDirection: 'down',
+        description: 'vs previous month',
+        icon: Percent,
+        colorSchema: 'rose',
+      },
+      {
+        title: 'Retention Rate',
+        value: loading ? '...' : `${(analytics?.retentionRate ?? 0).toFixed(1)}%`,
+        trend: '+0.5%',
+        trendDirection: 'up',
+        description: 'vs previous month',
+        icon: Activity,
+        colorSchema: 'indigo',
+      },
+      {
+        title: 'Revenue Impact',
+        value: loading ? '...' : `$${Math.round(analytics?.revenueImpact ?? 0).toLocaleString()}`,
+        trend: '+22.5%',
+        trendDirection: 'up',
+        description: 'projected growth',
+        icon: DollarSign,
+        colorSchema: 'emerald',
+      },
+    ];
+  }, [analytics, loading]);
 
   const isEmpty = analytics && analytics.totalCustomers === 0;
+
+  // Memoize summary cards layout
+  const renderedStatsCards = React.useMemo(() => (
+    <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {stats.map((stat, idx) => (
+        <motion.div
+          key={stat.title}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.15 + idx * 0.05 }}
+        >
+          <StatsCard {...stat} loading={loading} error={error} />
+        </motion.div>
+      ))}
+    </div>
+  ), [stats, loading, error]);
+
+  // Memoize chart preview wrapper
+  const renderedCharts = React.useMemo(() => {
+    if (isEmpty) return null;
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.35 }}
+        className="lg:col-span-2"
+      >
+        <ChartsPreview analyticsData={analytics} loading={loading} error={error} />
+      </motion.div>
+    );
+  }, [analytics, loading, error, isEmpty]);
 
   return (
     <DashboardLayout>
@@ -128,18 +166,7 @@ export const Dashboard = () => {
         </div>
 
         {/* Stats Grid summaries */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat, idx) => (
-            <motion.div
-              key={stat.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.15 + idx * 0.05 }}
-            >
-              <StatsCard {...stat} loading={loading} error={error} />
-            </motion.div>
-          ))}
-        </div>
+        {renderedStatsCards}
 
         {isEmpty ? (
           <motion.div
@@ -159,15 +186,7 @@ export const Dashboard = () => {
         ) : (
           /* Charts and Log Timeline Workspace grids */
           <div className="grid gap-6 lg:grid-cols-3">
-            {/* Visual Recharts graphs (take 2/3 width) */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.35 }}
-              className="lg:col-span-2"
-            >
-              <ChartsPreview analyticsData={analytics} loading={loading} error={error} />
-            </motion.div>
+            {renderedCharts}
 
             {/* Timeline Operational Logs (take 1/3 width) */}
             <motion.div
