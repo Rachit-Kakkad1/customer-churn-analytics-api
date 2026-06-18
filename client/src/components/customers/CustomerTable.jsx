@@ -29,7 +29,7 @@ const SkeletonRow = () => (
  * CustomerTable grid displaying dynamic names, emails, countries, and churn statuses
  * supporting edit/delete triggers, loading skeletons, error states, and empty states.
  */
-export const CustomerTable = ({ customers, loading, error, onEdit, onDelete }) => {
+export const CustomerTable = React.memo(({ customers, loading, error, onEdit, onDelete }) => {
   
   // Render status badge mapping based on backend churned boolean
   const getStatusBadge = (customer) => {
@@ -165,6 +165,8 @@ export const CustomerTable = ({ customers, loading, error, onEdit, onDelete }) =
       </div>
     </div>
   );
-};
+});
+
+CustomerTable.displayName = 'CustomerTable';
 
 export default CustomerTable;

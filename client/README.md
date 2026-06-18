@@ -1,73 +1,102 @@
-# React + TypeScript + Vite
+# 🎨 Customer Churn Analytics - Dashboard UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+[![React](https://img.shields.io/badge/React-19-20232A?style=for-the-badge&logo=react)](https://react.dev/)
+[![Vite](https://img.shields.io/badge/Vite-8.0-646CFF?style=for-the-badge&logo=vite)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Redux](https://img.shields.io/badge/Redux-Toolkit-764ABC?style=for-the-badge&logo=redux)](https://redux-toolkit.js.org/)
 
-Currently, two official plugins are available:
+A high-performance, modern analytics dashboard built for real-time visualization of customer churn metrics and behavioral patterns.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Highlights
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+-   🌗 **Adaptive Theme**: Full Dark/Light mode support with smooth transitions.
+-   📊 **Dynamic Data Viz**: Interactive charts using Recharts for LTV and Churn trends.
+-   🎭 **Fluid Animations**: UI powered by Framer Motion for high-impact user experience.
+-   🏗️ **State Management**: Centralized store using Redux Toolkit with RTK Query.
+-   🔒 **Secure Auth**: Protected routes and automatic token management.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠 Tech Stack
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+-   **Library**: React 19 (Functional Components + Hooks)
+-   **Build Tool**: Vite 8
+-   **Styling**: Tailwind CSS 4 & Framer Motion
+-   **Routing**: React Router 7
+-   **Forms**: React Hook Form + Zod/Joi validation
+-   **Toasts**: Sonner
+-   **Icons**: Lucide React & React Icons
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 📂 Component Architecture
+
+```text
+client/
+├── src/
+│   ├── app/            # Global providers & setup
+│   ├── components/     # UI Building Blocks
+│   │   ├── auth/       # Login/Register/Social
+│   │   ├── customers/  # Tables, Modals, Filters
+│   │   ├── dashboard/  # Stats Cards, Charts
+│   │   └── ui/         # Base atoms (Bells, Lists)
+│   ├── features/       # Redux Slices (Auth)
+│   ├── hooks/          # Custom utility hooks
+│   ├── layouts/        # Page wrappers (DashboardLayout)
+│   ├── pages/          # Full page views (Landing, Profile)
+│   ├── services/       # API Integration (Axios)
+│   └── store/          # Redux Store configuration
+└── vite.config.js      # Build config
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+---
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🚀 Getting Started
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Installation
+```bash
+npm install
 ```
+
+### 2. Configuration
+Ensure the backend API is running. If necessary, update the `VITE_API_URL` in your environment (default is handled in `services/api.js`).
+
+### 3. Development
+```bash
+npm run dev
+```
+
+### 4. Build for Production
+```bash
+npm run build
+```
+
+---
+
+## 🎨 Design System
+
+We use **Tailwind CSS** for a utility-first styling approach, combined with **Framer Motion** for micro-interactions:
+
+-   **Spacing**: Consistent 4px grid.
+-   **Typography**: Inter (Modern Sans-serif).
+-   **Colors**: Semantic naming (Primary, Success, Danger, Warning).
+-   **Feedback**: Sonner for non-intrusive status notifications.
+
+---
+
+## 👨‍💻 Workflow
+
+1.  **Feature Logic**: Define in `features/` slices.
+2.  **API Calls**: Centralized in `services/`.
+3.  **UI Atoms**: Create in `components/ui/`.
+4.  **Complex Views**: Compose in `pages/` using `layouts/`.
+
+---
+
+## 👤 Author
+
+**Rachit Kakkad**
+-   GitHub: [@Rachit Kakkad](https://github.com/Rachit-Kakkad1)
+-   LinkedIn: [in/rachit-kakkad](http://linkedin.com/in/rachit-kakkad)

@@ -1,329 +1,123 @@
-<div align="center">
+# 🚀 E-Commerce Customer Churn Analytics Platform
 
-# 🚀 E-Commerce Customer Churn Analytics API
+[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
+[![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-### **The ultimate production-grade backend solution for real-time customer behavior tracking and churn prediction.**
-
-[![Node.js Version](https://img.shields.io/badge/Node.js-v18.0.0-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Express.js](https://img.shields.io/badge/Express.js-v4.18.2-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-v6.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![JWT](https://img.shields.io/badge/JWT-Authentication-black?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/rachitkakkad/ecommerce-customer-churn-analytics-api?style=for-the-badge)](https://github.com/rachitkakkad/ecommerce-customer-churn-analytics-api/stargazers)
-[![GitHub Issues](https://img.shields.io/github/issues/rachitkakkad/ecommerce-customer-churn-analytics-api?style=for-the-badge)](https://github.com/rachitkakkad/ecommerce-customer-churn-analytics-api/issues)
+> **The ultimate production-grade solution for real-time customer behavior tracking and churn prediction.**
 
 ---
-
-[Explore Docs](https://github.com/rachitkakkad/ecommerce-customer-churn-analytics-api#readme) · [Report Bug](https://github.com/rachitkakkad/ecommerce-customer-churn-analytics-api/issues) · [Request Feature](https://github.com/rachitkakkad/ecommerce-customer-churn-analytics-api/issues)
-
-</div>
 
 ## 🌟 Project Vision
 
-> "Empowering e-commerce enterprises with actionable data-driven insights to proactively mitigate customer churn and maximize lifetime value through advanced behavioral analytics and predictive modeling."
+"Empowering e-commerce enterprises with actionable data-driven insights to proactively mitigate customer churn and maximize lifetime value through advanced behavioral analytics and predictive modeling."
 
 ---
 
-## 📖 Introduction
+## 🏗️ Architecture & Workflow
 
-The **E-Commerce Customer Churn Analytics API** is a high-performance, scalable backend engine designed to analyze customer behavior patterns and identify potential churn risks before they happen. Built with a focus on production-grade reliability, it provides deep insights into customer engagement, transaction history, and risk scoring.
+This project is a full-stack monorepo consisting of a high-performance **Express API** and a modern **React Dashboard**.
 
-This system isn't just a CRUD application; it's a comprehensive analytics platform that leverages modern backend architecture to deliver sub-second response times and robust security.
+### **Data Flow & User Journey**
+1.  **Ingestion**: Customer activity (transactions, login frequency, support calls) is captured via the REST API.
+2.  **Processing**: The server calculates complex KPIs like **Churn Probability** and **LTV** using the MongoDB Aggregation Framework.
+3.  **Visualization**: The React frontend retrieves this data and renders interactive charts (Recharts) and dynamic tables.
+4.  **Action**: Admins identify high-risk customers and take proactive retention measures.
 
----
-
-## 🛠 Tech Stack
-
-| Technology | Purpose |
-| :--- | :--- |
-| **Node.js** | Runtime Environment |
-| **Express.js** | Web Framework |
-| **MongoDB** | Primary Database |
-| **Mongoose** | ODM (Object Data Modeling) |
-| **JWT** | Secure Authentication |
-| **Bcrypt.js** | Password Hashing |
-| **Dotenv** | Environment Variable Management |
-
----
-
-## ✨ Key Features
-
--   👤 **Advanced User Management**: Role-based access control (RBAC) and profile management.
--   📊 **Real-time Analytics**: Dynamic calculation of customer retention and churn rates.
--   🛡️ **Proactive Security**: JWT-based auth and password hashing.
--   📈 **Predictive Scoring**: Algorithm-driven churn risk assessment based on activity patterns.
--   🚀 **High Performance**: Optimized MongoDB queries and indexing strategies.
--   📡 **RESTful API**: Clean, intuitive, and standard-compliant API design.
--   🔄 **Automated Pipelines**: Middleware-driven data validation and sanitzation.
-
----
-
-## 🔐 Authentication & Security
-
-We take security seriously. This API implements industry-standard security practices:
-
--   **JWT Authentication**: Stateless authentication using signed tokens.
--   **Password Hashing**: Bcrypt with a salt factor of 12 for maximum entropy.
--   **CORS Protection**: Controlled cross-origin resource sharing.
--   **Input Validation**: Strict schema-based validation using Mongoose and custom middleware.
-
----
-
-## 📊 Analytics & Customer Insights
-
-The API computes several critical KPIs:
-
-1.  **Churn Probability**: Probability score (0-1) based on time since last purchase and frequency.
-2.  **Customer Lifetime Value (CLV)**: Total revenue generated by a customer over their lifecycle.
-3.  **Engagement Score**: Weighted metric based on session frequency and interactions.
-4.  **Cohort Analysis**: Segregation of customers based on registration date and behavior.
-
----
-
-## ⚙️ Advanced API Features
-
-### 🔍 Filtering, Sorting, & Pagination
-Every list endpoint supports advanced query parameters:
--   **Filter**: `?status=active&riskScore[gte]=0.8`
--   **Sort**: `?sort=-createdAt,totalSpent`
--   **Pagination**: `?page=1&limit=20`
--   **Fields Selection**: `?fields=name,email,churnScore`
-
-### 🛡️ Middleware Architecture
--   `authMiddleware`: Validates JWT and attaches user to the request.
--   `errorMiddleware`: Centralized error handling for consistent API responses.
--   `loggerMiddleware`: Logs detailed request metadata for auditing.
+```mermaid
+graph LR
+  A[E-commerce App] -->|Events| B(Express API)
+  B -->|Aggregate| C[(MongoDB)]
+  C -->|Data| B
+  B -->|JSON| D(React Dashboard)
+  D -->|Charts/Lists| E[Admin Action]
+```
 
 ---
 
 ## 📂 Project Structure
 
-```text
-ecommerce-customer-churn-analytics-api/
-├── server/                 # Backend source code
-│   ├── src/
-│   │   ├── config/         # Database & environment configurations
-│   │   ├── controllers/    # Business logic for routes
-│   │   ├── middlewares/    # Custom Express middleware
-│   │   ├── models/         # Mongoose schemas & models
-│   │   ├── routes/         # API route definitions
-│   │   ├── utils/          # Helper functions & constants
-│   │   ├── services/       # External service integrations (Analytics, Email)
-│   │   └── app.js          # Express application setup
-│   ├── .env.example        # Template for environment variables
-│   ├── package.json        # Project dependencies & scripts
-│   └── server.js           # Entry point for the server
-```
+| Component | Path | Description |
+| :--- | :--- | :--- |
+| **Backend** | [`/server`](./server) | Node.js API with Mongoose, JWT, and Joi validation. |
+| **Frontend** | [`/client`](./client) | React 19 Dashboard with Redux Toolkit and Framer Motion. |
+| **API Docs** | [`Postman`](./Customer%20Churn%20Analytics%20API.postman_collection.json) | Full API collection for testing and integration. |
 
 ---
 
-## 🚀 Installation & Setup
+## ✨ Key Features
 
-### 1. Clone the repository
+-   👤 **Advanced User Management**: RBAC (Role-Based Access Control) with secure JWT sessions.
+-   📊 **Real-time Analytics**: Dynamic calculation of retention rates and churn probability.
+-   📈 **Predictive Scoring**: Algorithm-driven risk assessment based on activity patterns.
+-   🎨 **Modern UI**: Dark/Light mode, responsive design, and smooth animations.
+-   🛡️ **Enterprise Security**: Password hashing, input sanitization, and CORS protection.
+
+---
+
+## 🚀 Quick Start
+
+### 1. Prerequisites
+- Node.js (v18+)
+- MongoDB (Local or Atlas)
+
+### 2. Installation
+
 ```bash
+# Clone the repository
 git clone https://github.com/rachitkakkad/ecommerce-customer-churn-analytics-api.git
 cd ecommerce-customer-churn-analytics-api
+
+# Setup Backend
+cd server && npm install
+cp .env.example .env # Update with your MONGO_URI
+
+# Setup Frontend
+cd ../client && npm install
 ```
 
-### 2. Install dependencies
+### 3. Running the App
+
+**Start Backend:**
 ```bash
 cd server
-npm install
-```
-
-### 3. Setup Environment Variables
-Create a `.env` file in the `server` directory and add the following:
-```env
-PORT=5000
-NODE_ENV=development
-MONGO_URI=mongodb+srv://your_username:your_password@cluster0.mongodb.net/churnDB
-JWT_SECRET=your_super_secret_key
-JWT_EXPIRES_IN=1d
-```
-
-### 4. Run the application
-```bash
-# Development mode
 npm run dev
-
-# Production mode
-npm start
 ```
 
----
-
-## 🛣 API Endpoints
-
-### 🔐 Authentication
-| Method | Endpoint | Description | Access |
-| :--- | :--- | :--- | :--- |
-| POST | `/api/auth/register` | Register a new user | Public |
-| POST | `/api/auth/login` | Login user & get token | Public |
-| GET | `/api/auth/logout` | Logout user | Private |
-| GET | `/api/auth/profile` | Get current user info | Private |
-
-### 👥 Customers
-| Method | Endpoint | Description | Access |
-| :--- | :--- | :--- | :--- |
-| GET | `/api/customers` | Get all customers | Public |
-| POST | `/api/customers` | Add a new customer | Private |
-| GET | `/api/customers/:id` | Get single customer details | Public |
-| PATCH | `/api/customers/:id` | Update customer data | Private |
-| DELETE | `/api/customers/:id` | Delete customer data | Private |
-
-### 📈 Analytics
-| Method | Endpoint | Description | Access |
-| :--- | :--- | :--- | :--- |
-| GET | `/api/customers/analytics` | Get overall churn statistics | Private |
-
----
-
-## 🔄 Authentication Flow
-
-1.  **Request**: User sends credentials to `/login`.
-2.  **Validation**: Backend verifies credentials against hashed passwords in MongoDB.
-3.  **Token Generation**: JWT is signed with a secret and sent back in the response.
-4.  **Authorization**: Client sends JWT in the `Authorization: Bearer <token>` header for subsequent requests.
-5.  **Verification**: Middleware verifies token validity and permissions.
-
----
-
-## 🗄 Database Schema (Example)
-
-### Customer Schema
-```javascript
-{
-  name: { type: String, required: true },
-  email: { type: String, unique: true },
-  lastPurchase: { type: Date },
-  purchaseFrequency: { type: Number }, // Avg purchases per month
-  totalSpent: { type: Number },
-  churnScore: { type: Number, default: 0 }, // Calculated 0-1
-  status: { type: String, enum: ['active', 'inactive', 'churned'] }
-}
-```
-
----
-
-## 🚨 Error Handling
-
-The API uses a global error-handling middleware to ensure consistent responses:
-
-```json
-{
-  "status": "error",
-  "message": "Resource not found",
-  "stack": "..." // Only in development mode
-}
-```
-
----
-
-## ⚡ Performance Optimizations
-
--   **Indexing**: Critical fields like `email`, `churnScore`, and `lastPurchase` are indexed in MongoDB.
--   **Lean Queries**: Using `.lean()` for read-only operations to reduce overhead.
--   **Caching**: (Planned) Integration with Redis for frequently accessed analytics data.
--   **Compression**: Gzip compression for all HTTP responses.
-
----
-
-## 🔮 Future Enhancements
-
--   [ ] **Machine Learning Integration**: Real-time churn prediction using TensorFlow.js.
--   [ ] **Dashboard UI**: A React-based admin dashboard for visual analytics.
--   [ ] **Email Alerts**: Automatic email triggers for high-risk customers.
--   [ ] **Webhook Support**: Notify external systems when a customer's risk changes.
-
----
-
-<!-- 
-## 📸 Screenshots
-
-<div align="center">
-  <img src="https://via.placeholder.com/800x450.png?text=Dashboard+Analytics+Overview" alt="Dashboard Overview" width="800">
-  <br>
-  <em>Figure 1: Real-time Customer Risk Dashboard (Placeholder)</em>
-</div>
-
-<div align="center">
-  <img src="https://via.placeholder.com/800x450.png?text=API+Documentation+Swagger" alt="API Documentation" width="800">
-  <br>
-  <em>Figure 2: Interactive API Documentation (Placeholder)</em>
-</div>
--->
-
----
-
-## 📡 API Usage Examples
-
-### 🔍 Get Customer Analytics
-**Endpoint**: `GET /api/customers/analytics`
-
-**Sample Request**:
+**Start Frontend:**
 ```bash
-curl -X GET "https://api.churnanalytics.com/api/customers/analytics" \
-     -H "Authorization: Bearer YOUR_JWT_TOKEN"
-```
-
-**Sample Response**:
-```json
-{
-  "success": true,
-  "data": {
-    "totalCustomers": 150,
-    "churnedCustomers": 45,
-    "averageAge": 34.5,
-    "averagePurchases": 12.4
-  }
-}
+cd client
+npm run dev
 ```
 
 ---
 
-## 🛡️ Security Best Practices
+## 🛠️ Tech Stack
 
-This project adheres to the following security protocols:
+### **Frontend**
+- **Framework**: React 19 + Vite
+- **State**: Redux Toolkit
+- **Styling**: Tailwind CSS + Framer Motion
+- **Charts**: Recharts
+- **Icons**: Lucide React
 
-1.  **Environment Isolation**: Sensitive keys are never hardcoded and are managed via `.env`.
-2.  **NoSQL Injection Prevention**: Mongoose schemas and strict validation prevent malicious query injections.
-3.  **Data Sanitization**: All incoming data is sanitized against XSS and other script-based attacks.
-4.  **Least Privilege**: RBAC ensures users only access the data they are authorized to see.
-5.  **Secure Transports**: Designed to be served over HTTPS with TLS 1.3.
-
----
-
-## 🚀 Deployment
-
-The API is ready for deployment on modern cloud platforms:
-
--   **Docker**: Multi-stage builds for optimized image sizes.
--   **Render / Heroku**: Easy one-click deployment using the `Procfile`.
--   **AWS / GCP**: Can be orchestrated using Kubernetes or managed services like App Runner.
-
-```bash
-# Example Docker Build
-docker build -t churn-analytics-api .
-docker run -p 5000:5000 --env-file .env churn-analytics-api
-```
+### **Backend**
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: MongoDB + Mongoose
+- **Validation**: Joi
+- **Auth**: JSON Web Tokens (JWT) + BcryptJS
 
 ---
 
-## 🤝 Contributing
+## 📄 Documentation
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+For detailed guides, please visit the respective directories:
+- 📖 [Backend Documentation](./server/README.md)
+- 🎨 [Frontend Documentation](./client/README.md)
 
 ---
 
@@ -331,24 +125,11 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 **Rachit Kakkad**
 -   GitHub: [@Rachit Kakkad](https://github.com/Rachit-Kakkad1)
--   LinkedIn: [@Rachit Kakkad](http://linkedin.com/in/rachit-kakkad)
--   Twitter: [@Rachit Kakkad](https://x.com/rachit_kakk2957)
-
----
-
-## 🙏 Acknowledgements
-
--   [Node.js Documentation](https://nodejs.org/en/docs/)
--   [Express.js Guide](https://expressjs.com/)
--   [Mongoose Documentation](https://mongoosejs.com/docs/)
--   [Shields.io for Badges](https://shields.io/)
+-   LinkedIn: [in/rachit-kakkad](http://linkedin.com/in/rachit-kakkad)
+-   Twitter: [@rachit_kakk2957](https://x.com/rachit_kakk2957)
 
 ---
 
 <div align="center">
-
-### Built with ❤️ by [Rachit Kakkad](https://github.com/Kakkad-Rachit1)
-
-**[↑ Back to Top](#-e-commerce-customer-churn-analytics-api)**
-
+Built with ❤️ by Rachit Kakkad
 </div>
